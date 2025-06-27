@@ -1,0 +1,65 @@
+{
+    "commitizen": {
+        "name": "cz_customize",
+        "customize": {
+            "message_template": "{{change_type}}:{% if show_message %} {{message}}{% endif %}",
+            "example": "feat: добавил новую функцию",
+            "schema": "<type>: <body>",
+            "types": [
+                {
+                    "value": "feat",
+                    "name": "feat: Новая функционал"
+                },
+                {
+                    "value": "bug fix",
+                    "name": "bug fix: Исправление багов"
+                },
+                {
+                    "value": "docs",
+                    "name": "docs: Изменение документации"
+                },
+                {
+                    "value": "style",
+                    "name": "style: Изменение стилей"
+                },
+                {
+                    "value": "refactor",
+                    "name": "refactor: Изменение кода, которое не исправляет ошибку и не добавляет новый функционал"
+                },
+                {
+                    "value": "perf",
+                    "name": "perf: Изменение кода, повышающее производительность"
+                },
+                {
+                    "value": "test",
+                    "name": "test: Добавление отсутствующих тестов или исправление существующих тестов"
+                },
+                {
+                    "value": "chore",
+                    "name": "chore: Изменения в процессе сборки или вспомогательных инструментах и библиотеках"
+                },
+                {
+                    "value": "revert",
+                    "name": "revert: Вернуться к предыдущему коммиту"
+                },
+                {
+                    "value": "WIP",
+                    "name": "WIP: Работа в процессе"
+                }
+            ],
+            "questions": [
+                {
+                    "type": "input",
+                    "name": "message",
+                    "message": "Ваши изменения."
+                },
+                {
+                    "type": "confirm",
+                    "name": "show_message",
+                    "message": "Хотите ли вы добавить текст сообщения в коммит?",
+                    "default": true
+                }
+            ]
+        }
+    }
+}

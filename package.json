@@ -1,0 +1,57 @@
+{
+  "name": "tablesheets",
+  "version": "1.0.0",
+  "description": "Storing and editing data in the form of tables",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "test": "jest --passWithNoTests --detectOpenHandles --watch",
+    "build": "webpack",
+    "start": "webpack serve --open",
+    "commit": "cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexandr-web/table-sheets.git"
+  },
+  "author": "Alexandr Yakovlev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexandr-web/table-sheets/issues"
+  },
+  "homepage": "https://github.com/Alexandr-web/table-sheets#readme",
+  "devDependencies": {
+    "@babel/core": "^7.27.7",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-typescript": "^7.27.1",
+    "@jest/globals": "^30.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.4",
+    "babel-jest": "^30.0.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "commitizen": "^4.3.1",
+    "css-loader": "^7.1.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jest": "^30.0.3",
+    "node-notifier": "^10.0.1",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.89.2",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "ts-jest": "^29.4.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "cz-customizable": {
+      "config": "./commitizen.json"
+    }
+  }
+}
