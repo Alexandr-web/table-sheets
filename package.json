@@ -7,7 +7,7 @@
     "test": "jest --passWithNoTests --detectOpenHandles --watch",
     "build": "webpack",
     "start": "webpack serve --open",
-    "commit": "cz"
+    "commit": "cz-customizable"
   },
   "repository": {
     "type": "git",
@@ -53,5 +53,8 @@
     "cz-customizable": {
       "config": "./commitizen.json"
     }
+  },
+  "dependencies": {
+    "cz-customizable": "^7.4.0"
   }
 }
