@@ -1,0 +1,179 @@
+@use "@/styles/global.scss";
+@use "@/styles/vars.scss" as vars;
+@use "@/styles/mixins.scss" as mixins;
+
+.wrapper {
+    min-height: 100vh;
+    max-height: 100vh;
+    padding: mixins.scale(10) 0;
+    display: flex;
+    flex-direction: column;
+
+    .container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__content {
+        max-height: calc(100vh - mixins.scale(20));
+        flex-grow: 1;
+        background-color: rgba(vars.$light-gray-2, .4);
+        border-radius: mixins.scale(10);
+        padding: mixins.scale(10);
+        gap: mixins.scale(8);
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__header {
+        background-color: vars.$light-gray-1;
+        border-radius: mixins.scale(10);
+        padding: mixins.scale(10);
+    }
+
+    &__main {
+        display: flex;
+        flex-grow: 1;
+        overflow-y: auto;
+        overflow-x: auto;
+        position: relative;
+
+        &-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: vars.$light-gray-1;
+            border-radius: 0 mixins.scale(10) mixins.scale(10) 0;
+        }
+    }
+
+    &__letters {
+        height: mixins.scale(vars.$tableLettersHeight);
+        width: max-content;
+        position: sticky;
+        top: 0;
+        background-color: vars.$white;
+
+        &-list {
+            display: flex;
+            gap: mixins.scale(1);
+            height: 100%;
+
+            &-item {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                width: mixins.scale(80);
+                font-size: mixins.scale(8);
+                padding: mixins.scale(8);
+                user-select: none;
+                text-transform: uppercase;
+                border-bottom: mixins.scale(1) solid vars.$light-gray-2;
+
+                &:not(:last-child) {
+                    border-right: mixins.scale(1) solid vars.$light-gray-2;
+                }
+
+                &:last-child {
+                    border-radius: 0 mixins.scale(10) 0 0;
+                }
+            }
+        }
+    }
+
+    &__nums {
+        background-color: vars.$light-gray-1;
+        border-radius: mixins.scale(10) 0 0 mixins.scale(10);
+        min-width: mixins.scale(30);
+        padding-top: mixins.scale(vars.$tableLettersHeight);
+        height: max-content;
+        position: sticky;
+        left: 0;
+        background-color: vars.$white;
+
+        &-list {
+            display: flex;
+            flex-direction: column;
+            gap: mixins.scale(1);
+            width: 100%;
+
+            &-item {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: mixins.scale(20);
+                font-size: mixins.scale(8);
+                padding: mixins.scale(8);
+                user-select: none;
+
+                &:not(:last-child) {
+                    border-bottom: mixins.scale(1) solid vars.$light-gray-2;
+                }
+
+                &:last-child {
+                    border-radius: 0 0 0 mixins.scale(10);
+                }
+            }
+        }
+    }
+
+    &__cells {
+        width: max-content;
+        flex-grow: 1;
+        display: flex;
+
+        &-list {
+            width: mixins.scale(200);
+            display: flex;
+            flex-direction: column;
+
+            &:not(:last-child) {
+                border-right: mixins.scale(1) solid vars.$light-gray-2;
+            }
+
+            &-item {
+                padding: 0 mixins.scale(5);
+                opacity: .8;
+
+                &:not(:last-child) {
+                    border-bottom: mixins.scale(1) solid vars.$light-gray-2;
+                }
+
+                &:focus,
+                &:active {
+                    opacity: 1;
+                    outline: mixins.scale(1) solid vars.$blue-1;
+                }
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
+.logo-title {
+    font-size: mixins.scale(14);
+    font-weight: 400;
+    position: relative;
+    display: inline;
+
+    &__span {
+        color: vars.$blue-1;
+    }
+}
+
+.version {
+    opacity: .5;
+    font-size: mixins.scale(8);
+    font-weight: 500;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateX(100%);
+    z-index: 99;
+}

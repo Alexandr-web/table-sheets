@@ -1,4 +1,6 @@
 @use "@/styles/fonts.scss";
+@use "@/styles/mixins.scss" as mixins;
+@use "@/styles/vars.scss" as vars;
 
 *,
 *::before,
@@ -18,4 +20,15 @@ img {
 
 body {
     font-family: "Open Sans";
+    background-color: vars.$light-gray-1;
+    color: vars.$dark-gray-1;
+    max-height: 100vh;
+}
+
+.container {
+    padding: 0 mixins.scale(10);
+    max-width: mixins.scale(1044);
+    margin: 0 auto;
+    height: 100%;
+    width: 100%;
 }
