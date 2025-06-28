@@ -1,0 +1,6 @@
+@use "@/styles/vars.scss" as vars;
+
+// конвертация px в vw
+@function scale($px) {
+  @return calc($px / vars.$base) * 100vw;
+}

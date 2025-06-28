@@ -1,5 +1,4 @@
-@use "@/styles/vars.scss" as vars;
-@use "@/styles/mixins.scss" as mixins;
+@use "@/styles/fonts.scss";
 
 *,
 *::before,
@@ -15,4 +14,8 @@
 img {
     max-width: 100%;
     height: auto;
+}
+
+body {
+    font-family: "Open Sans";
 }
