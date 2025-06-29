@@ -125,7 +125,7 @@ export default class Table implements ITableClass {
 
         // функции для получения HTML строк ячейки и буквы
         const cellHTML = (cell: ICell): string => 
-            (`<li class="wrapper__cells-list-item" data-pos='${JSON.stringify(cell.position)}' contenteditable></li>`);
+            (`<li class="wrapper__cells-list-item" style="color: ${cell.color}; background: ${cell.background}" data-pos='${JSON.stringify(cell.position)}' contenteditable></li>`);
         const cellLetterHTML = (letter: string): string => 
             (`<div class="wrapper__cells-letter" data-val="${letter}">${letter}</div>`);
 

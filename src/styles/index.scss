@@ -146,6 +146,8 @@
                 height: mixins.scale(30);
                 opacity: .8;
                 border: mixins.scale(1) solid vars.$light-gray-2;
+                scrollbar-width: thin;
+                overflow: auto;
 
                 &:focus,
                 &:active {
