@@ -2,13 +2,14 @@
   "verbose": true,
   "errorOnDeprecated": true,
   "notify": true,
-  "randomize": true,
   "showSeed": true,
   "notifyMode": "failure",
   "cacheDirectory": "./tests/cache",
-  "coveragePathIgnorePatterns": ["node_modules", "dist", "src"],
-  "modulePathIgnorePatterns": ["node_modules", "dist", "src"],
   "modulePaths": ["tests"],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "testEnvironment": "jsdom",
   "moduleFileExtensions": ["ts", "js"],
   "displayName": "FRONT"
 }
