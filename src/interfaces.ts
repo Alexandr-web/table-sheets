@@ -1,4 +1,4 @@
-import { TLettersArr, TIterationLetters, TCellPos } from "@/types";
+import { TCellPos } from "@/types";
 
 export interface ITableClass {
     nums: Array<number>;
@@ -10,7 +10,7 @@ export interface ITableClass {
 
     _fillNums(): Array<number>;
     _fillCells(): Array<ICell>;
-    _fillLetters<T1 extends TLettersArr, T2 extends TIterationLetters>(lettersArr?: T1, iteration?: T2): TLettersArr;
+    _fillLetters(lettersArr?: Array<string>, iteration?: number): Array<string>;
     _getLengthEnglishAlphabet(): number;
     _resize(): void;
     renderCells(): void;
@@ -22,9 +22,9 @@ export interface ITableClass {
 export interface ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
-    elNums: NodeListOf<HTMLLIElement>;
     activeClassName: string;
 
+    _getElNums(): NodeListOf<HTMLLIElement>;
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
     init(): void;

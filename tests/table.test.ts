@@ -2,7 +2,6 @@ import { expect, test } from "@jest/globals";
 
 import Table from "../src/classes/Table";
 import { ICell, ITableClass } from "../src/interfaces";
-import { TLettersArr } from "../src/types";
 import { EnglishAlphabet, Colors } from "../src/enums";
 
 describe("Тест класса Table", () => {
@@ -50,14 +49,14 @@ describe("Тест класса Table", () => {
 
     test("проверка заполнения букв таблицы (передано 26 букв)", () => {
         const table: ITableClass = new Table();
-        const res: TLettersArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+        const res: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
         expect(JSON.stringify(table._fillLetters())).toBe(JSON.stringify(res));
     });
 
     test("проверка заполнения букв таблицы (передано 30 букв)", () => {
         const table: ITableClass = new Table(30);
-        const res: TLettersArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD"];
+        const res: Array<string> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD"];
 
         expect(JSON.stringify(table._fillLetters())).toBe(JSON.stringify(res));
     });

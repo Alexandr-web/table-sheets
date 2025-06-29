@@ -1,6 +1,6 @@
 import { ITableClass, ICell } from "@/interfaces";
 import { EnglishAlphabet, Colors } from "@/enums";
-import { TLettersArr, TIterationLetters, TAccumulatorCells } from "@/types";
+import { TAccumulatorCells } from "@/types";
 import pxToVw from "@/utils/pxToVw";
 
 // минимальное количество комбинаций
@@ -52,8 +52,8 @@ export default class Table implements ITableClass {
     }
 
     // получение букв таблицы
-    _fillLetters<T1 extends TLettersArr, T2 extends TIterationLetters>(lettersArr?: T1, iteration?: T2): TLettersArr {
-        const result: TLettersArr = lettersArr || [];
+    _fillLetters(lettersArr?: Array<string>, iteration?: number): Array<string> {
+        const result: Array<string> = lettersArr || [];
 
         // выход из рекурсии с выводом всех возможных комбинаций букв
         if (result.length >= this._countNums) {

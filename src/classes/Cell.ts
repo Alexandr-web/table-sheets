@@ -3,20 +3,23 @@ import { ICellClass } from "@/interfaces";
 export default class Cell implements ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
-    elNums: NodeListOf<HTMLLIElement>;
     activeClassName: string;
 
     constructor() {
         this.elCells = document.querySelectorAll(".wrapper__cells-list-item") as NodeListOf<HTMLLIElement>;
         this.elLetters = document.querySelectorAll(".wrapper__cells-letter") as NodeListOf<HTMLDivElement>;
-        this.elNums = document.querySelectorAll(".wrapper__nums-list-item") as NodeListOf<HTMLLIElement>;
         this.activeClassName = "active";
+    }
+
+    // получение элементов чисел (получаем через метод, так как они могут обновляться после изменения размеров экрана)
+    _getElNums(): NodeListOf<HTMLLIElement> {
+        return document.querySelectorAll(".wrapper__nums-list-item") as NodeListOf<HTMLLIElement>;
     }
 
     // удаление активного класса у ячеек, чисел и букв
     _clearActive(): void {
         this.elCells.forEach((cell) => cell.classList.remove(this.activeClassName));
-        this.elNums.forEach((num) => num.classList.remove(this.activeClassName));
+        this._getElNums().forEach((num) => num.classList.remove(this.activeClassName));
         this.elLetters.forEach((letter) => letter.classList.remove(this.activeClassName));
     }
 
@@ -27,7 +30,7 @@ export default class Cell implements ICellClass {
             .from(this.elLetters)
             .find((el) => el.dataset.val === activeLetter) as HTMLDivElement;
         const findActiveElNum: HTMLLIElement = Array
-            .from(this.elNums)
+            .from(this._getElNums())
             .find((el) => el.dataset.val === activeNum.toString()) as HTMLLIElement;
 
         this._clearActive();
@@ -41,7 +44,7 @@ export default class Cell implements ICellClass {
     // инициализация работы ячеек
     init(): void {
         this.elCells.forEach((cell) => {
-            cell.addEventListener("focus", () => this._setActive(cell));
+            cell.addEventListener("focus", this._setActive.bind(this, cell));
         });
     }
 }
