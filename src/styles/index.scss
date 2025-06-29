@@ -69,6 +69,11 @@
                 border-left: mixins.scale(1) solid vars.$light-gray-2;
                 background-color: vars.$white;
 
+                &.active {
+                    border-color: vars.$blue-1;
+                    color: vars.$blue-1;
+                }
+
                 &:first-child {
                     border-radius: mixins.scale(10) 0 0 0;
                     border-top: mixins.scale(1) solid vars.$light-gray-2;
@@ -125,6 +130,11 @@
             z-index: 99;
             background-color: vars.$white;
             margin-bottom: mixins.scale(5);
+
+            &.active {
+                border-color: vars.$blue-1;
+                color: vars.$blue-1;
+            }
         }
 
         &-list {
@@ -144,6 +154,11 @@
                 }
 
                 &:hover {
+                    opacity: 1;
+                }
+
+                &.active {
+                    border-color: vars.$blue-1;
                     opacity: 1;
                 }
             }

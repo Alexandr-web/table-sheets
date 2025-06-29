@@ -1,31 +1,32 @@
-import { ITable, ICell } from "@/interfaces";
+import { ITableClass, ICell } from "@/interfaces";
 import { EnglishAlphabet, Colors } from "@/enums";
 import { TLettersArr, TIterationLetters, TAccumulatorCells } from "@/types";
 import pxToVw from "@/utils/pxToVw";
 
-export default class Table implements ITable {
+// минимальное количество комбинаций
+const minCombinations: number = 26;
+// максимально возможное количество комбинаций
+const maxCombinations = 702;
+
+export default class Table implements ITableClass {
     nums: Array<number>;
     letters: Array<string>;
     cells: Array<ICell>;
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
-    _maxCombinations: number;
     _countNums: number;
 
-    constructor(countNums: number = 26) {
+    constructor(countNums: number = minCombinations) {
         this.nums = [];
         this.letters = [];
         this.cells = [];
         this.elListNums = document.querySelector(".wrapper__nums-list") as HTMLUListElement;
         this.elWrapCells = document.querySelector(".wrapper__cells") as HTMLDivElement;
 
-        // максимально возможное количество комбинаций = 702
-        this._maxCombinations = 702;
-
-        if (countNums < 26) {
-            this._countNums = 26;
-        } else if (countNums > this._maxCombinations) {
-            this._countNums = this._maxCombinations;
+        if (countNums < minCombinations) {
+            this._countNums = minCombinations;
+        } else if (countNums > maxCombinations) {
+            this._countNums = maxCombinations;
         } else {
             this._countNums = countNums;
         }
@@ -66,7 +67,7 @@ export default class Table implements ITable {
             // добавляем комбинацию букв, если количество чисел больше, чем длина английского алфавита
             const remainder: number = this._countNums - result.length;
 
-            let count: number = remainder > lengthEnglishAlphabet ? 26 : remainder;
+            let count: number = remainder > lengthEnglishAlphabet ? minCombinations : remainder;
 
             for (let i = 0; i < count; i++) {
                 const str: string = EnglishAlphabet[iteration] + EnglishAlphabet[i];
@@ -81,8 +82,8 @@ export default class Table implements ITable {
             }
         }
 
-        // на каждый вызов функции прибавляем итерацию на 1 для последующей комбинации букв
-        return this._fillLetters<TLettersArr, TIterationLetters>(result, (iteration === undefined ? -1 : iteration) + 1);
+        // на каждый вызов функции увеличиваем итерацию на 1 для последующей комбинации букв
+        return this._fillLetters(result, (iteration === undefined ? -1 : iteration) + 1);
     }
 
     // получение ячеек таблицы

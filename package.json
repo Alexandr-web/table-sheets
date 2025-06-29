@@ -4,7 +4,7 @@
   "description": "Storing and editing data in the form of tables",
   "main": "./dist/bundle.js",
   "scripts": {
-    "test": "jest --passWithNoTests --detectOpenHandles --watch",
+    "test": "jest --passWithNoTests --detectOpenHandles --watchAll",
     "build": "webpack",
     "start": "webpack serve --open",
     "commit": "cz-customizable"
@@ -52,7 +52,7 @@
       "path": "./node_modules/cz-conventional-changelog"
     },
     "cz-customizable": {
-      "config": "./commitizen.json"
+      "config": "./commitizen.config.json"
     }
   },
   "dependencies": {

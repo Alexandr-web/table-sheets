@@ -10,7 +10,7 @@ describe("Тест раздела Utils", () => {
         expect(pxToVw(960, 1920)).toBe("50.00");
     });
 
-    test("pxToVw (передано 0, 0)", () => {
+    test("pxToVw (передано 0, 1920)", () => {
         expect(pxToVw(0, 1920)).toBe("0.00");
     });
 

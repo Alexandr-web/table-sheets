@@ -1,12 +1,11 @@
 import { TLettersArr, TIterationLetters, TCellPos } from "@/types";
 
-export interface ITable {
+export interface ITableClass {
     nums: Array<number>;
     letters: Array<string>;
     cells: Array<ICell>;
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
-    _maxCombinations: number;
     _countNums: number;
 
     _fillNums(): Array<number>;
@@ -18,6 +17,17 @@ export interface ITable {
     renderNums(): void;
     clearNums(): void;
     render(): void;
+}
+
+export interface ICellClass {
+    elCells: NodeListOf<HTMLLIElement>;
+    elLetters: NodeListOf<HTMLDivElement>;
+    elNums: NodeListOf<HTMLLIElement>;
+    activeClassName: string;
+
+    _clearActive(): void;
+    _setActive(cell: HTMLLIElement): void;
+    init(): void;
 }
 
 export interface ICell {
