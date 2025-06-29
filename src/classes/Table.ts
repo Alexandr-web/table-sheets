@@ -1,6 +1,7 @@
 import { ITable, ICell } from "@/interfaces";
 import { EnglishAlphabet, Colors } from "@/enums";
 import { TLettersArr, TIterationLetters, TAccumulatorCells } from "@/types";
+import pxToVw from "@/utils/pxToVw";
 
 export default class Table implements ITable {
     nums: Array<number>;
@@ -121,30 +122,19 @@ export default class Table implements ITable {
             return acc;
         }, []);
 
-        // функции для получения HTML строк ячейки, числа и буквы
+        // функции для получения HTML строк ячейки и буквы
         const cellHTML = (cell: ICell): string => 
             (`<li class="wrapper__cells-list-item" data-pos='${JSON.stringify(cell.position)}' contenteditable></li>`);
-        const cellNumHTML = (num: number): string => 
-            (`<li class="wrapper__cells-num" data-val="${num}">${num}</li>`);
         const cellLetterHTML = (letter: string): string => 
             (`<div class="wrapper__cells-letter" data-val="${letter}">${letter}</div>`);
 
-        // добавление ячеек, букв и чисел в формате строки HTML в элемент
+        // добавление ячеек и букв в формате строки HTML в элемент
         sortedCellsByLetter.forEach((list, idxList) => {
-            // HTML строка ячейки (может быть вместе с числом, если список первый)
-            const cellsHTML: string = list.map((cell, idxCell) => {
-                const cellHTMLStr: string = cellHTML(cell);
-
-                // добавляем HTML строку числа, если это первый список
-                if (idxList === 0) {
-                    return cellNumHTML(this.nums[idxCell]) + cellHTMLStr;
-                }
-
-                return cellHTMLStr;
-            }).join("\n");
+            // HTML строка ячейки
+            const cellsHTML: string = list.map(cellHTML).join("\n");
             // HTML строка списка ячеек
             const listHTML: string = 
-                `<ul class="wrapper__cells-list ${idxList === 0 ? 'nums-list' : ''}">${cellsHTML}</ul>`;
+                `<ul class="wrapper__cells-list">${cellsHTML}</ul>`;
 
             // HTML строка контента колонки
             const rowContentHTML: string = [cellLetterHTML(this.letters[idxList]), listHTML]
@@ -156,6 +146,32 @@ export default class Table implements ITable {
         });
     }
 
+    // добавление чисел в таблицу
+    renderNums(): void {
+        const firstRow: HTMLDivElement = document.querySelector(".wrapper__cells-row:first-child") as HTMLDivElement;
+        const firstCell: HTMLLIElement = firstRow.querySelector(".wrapper__cells-list-item") as HTMLLIElement;
+        const height: number = firstCell.offsetHeight;
+        const top: number = firstCell.offsetTop;
+
+        this.elListNums.style.marginTop = `${pxToVw(top)}vw`;
+
+        this.nums.forEach((num) => {
+            const numHTML: string = `<li class="wrapper__nums-list-item" style="height: ${pxToVw(height)}vw" data-val="${num}">${num}</li>`;
+
+            this.elListNums.innerHTML += numHTML;
+        });
+    }
+
+    // очистка содержимого HTML у списка чисел
+    clearNums(): void {
+        this.elListNums.innerHTML = "";
+    }
+
+    _resize(): void {
+        this.clearNums();
+        this.renderNums();
+    }
+
     // отображение данных таблицы на странице
     render(): void {
         this.letters = this._fillLetters();
@@ -163,5 +179,9 @@ export default class Table implements ITable {
         this.cells = this._fillCells();
 
         this.renderCells();
+        this.renderNums();
+
+        window.removeEventListener("resize", this._resize.bind(this));
+        window.addEventListener("resize", this._resize.bind(this));
     }
 }

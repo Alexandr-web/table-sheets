@@ -13,7 +13,10 @@ export interface ITable {
     _fillCells(): Array<ICell>;
     _fillLetters<T1 extends TLettersArr, T2 extends TIterationLetters>(lettersArr?: T1, iteration?: T2): TLettersArr;
     _getLengthEnglishAlphabet(): number;
+    _resize(): void;
     renderCells(): void;
+    renderNums(): void;
+    clearNums(): void;
     render(): void;
 }
 
