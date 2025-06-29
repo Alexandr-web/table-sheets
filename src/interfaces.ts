@@ -19,6 +19,20 @@ export interface ITableClass {
     render(): void;
 }
 
+export interface ILetterClass {
+    _elLetters: NodeListOf<HTMLDListElement>;
+    _elCells: NodeListOf<HTMLLIElement>;
+    _elLetterThins: NodeListOf<HTMLSpanElement>;
+    _startX: number|null;
+    _currentRowWidth: number|null;
+    _currentRow: HTMLDivElement|null;
+
+    _stopResizeRow(): void;
+    _mouseResizeRow(e: MouseEvent): void;
+    _startResizeRow(e: MouseEvent, thin: HTMLSpanElement): void;
+    init(): void;
+}
+
 export interface ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
