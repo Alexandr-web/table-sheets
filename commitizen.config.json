@@ -5,7 +5,7 @@
     "types": [
         {
             "value": "feat",
-            "name": "feat: Новая функционал"
+            "name": "feat: Новый функционал"
         },
         {
             "value": "bug fix",
