@@ -6,7 +6,9 @@ import pxToVw from "@/utils/pxToVw";
 // минимальное количество комбинаций
 const minCombinations: number = 26;
 // максимально возможное количество комбинаций
-const maxCombinations = 702;
+const maxCombinations: number = 702;
+// минимально возможная ширина ряда ячеек
+const minRowWidth: number = 40;
 
 export default class Table implements ITableClass {
     nums: Array<number>;
@@ -15,6 +17,9 @@ export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     _countNums: number;
+    _startX: number|null;
+    _currentRowWidth: number|null;
+    _currentRow: HTMLDivElement|null;
 
     constructor(countNums: number = minCombinations) {
         this.nums = [];
@@ -22,6 +27,10 @@ export default class Table implements ITableClass {
         this.cells = [];
         this.elListNums = document.querySelector(".wrapper__nums-list") as HTMLUListElement;
         this.elWrapCells = document.querySelector(".wrapper__cells") as HTMLDivElement;
+
+        this._startX = null;
+        this._currentRow = null;
+        this._currentRowWidth = null;
 
         if (countNums < minCombinations) {
             this._countNums = minCombinations;
@@ -171,9 +180,52 @@ export default class Table implements ITableClass {
         this.elListNums.innerHTML = "";
     }
 
-    _resize(): void {
+    // обновление данных во время изменения размеров экрана
+    _resizeHandler(): void {
         this.clearNums();
         this.renderNums();
+    }
+
+    // фиксирование данных изменяемого ширину ряда
+    _startResizeRow(e: MouseEvent, thin: HTMLSpanElement): void {
+        const parentRow: HTMLDivElement = thin.closest(".wrapper__cells-row") as HTMLDivElement;
+
+        this._currentRowWidth = parentRow.offsetWidth;
+        this._currentRow = parentRow;
+        this._startX = e.pageX;
+    }
+
+    // очистка данных изменяемого ширину ряда
+    _stopResizeRow(): void {
+        this._currentRowWidth = null;
+        this._currentRow = null;
+        this._startX = null;
+    }
+
+    // изменение ширины ряда
+    _mouseResizeRow(e: MouseEvent): void {
+        if (this._startX === null || this._currentRowWidth === null || this._currentRow === null) {
+            return;
+        }
+
+        const currentX: number = e.pageX;
+        const width: number = currentX - this._startX + this._currentRowWidth;
+
+        if (width >= minRowWidth) {
+            this._currentRow.style.width = `${pxToVw(width)}vw`;
+        }
+    }
+
+    // инициализация событий для изменения ширины ряда ячеек
+    _initEventsToResizeRow(): void {
+        const thins: NodeListOf<HTMLSpanElement> = document.querySelectorAll(".wrapper__cells-letter-thin") as NodeListOf<HTMLSpanElement>;
+
+        thins.forEach((thin) => {
+           thin.addEventListener("mousedown", (e) => this._startResizeRow(e, thin)); 
+        });
+
+        window.addEventListener("mousemove", this._mouseResizeRow.bind(this));
+        window.addEventListener("mouseup", this._stopResizeRow.bind(this));
     }
 
     // отображение данных таблицы на странице
@@ -185,7 +237,10 @@ export default class Table implements ITableClass {
         this.renderCells();
         this.renderNums();
 
-        window.removeEventListener("resize", this._resize.bind(this));
-        window.addEventListener("resize", this._resize.bind(this));
+        window.removeEventListener("resize", this._resizeHandler.bind(this));
+        window.addEventListener("resize", this._resizeHandler.bind(this));
+
+        // добавление событий для изменения ширины ряда ячеек
+        this._initEventsToResizeRow();
     }
 }
