@@ -7,8 +7,10 @@ import pxToVw from "@/utils/pxToVw";
 const minCombinations: number = 26;
 // максимально возможное количество комбинаций
 const maxCombinations: number = 702;
-// минимально возможная ширина ряда ячеек
+// минимальная ширина ряда ячеек
 const minRowWidth: number = 40;
+// минимальная высота ячеек
+const minColHeight: number = 40;
 
 export default class Table implements ITableClass {
     nums: Array<number>;
@@ -20,6 +22,10 @@ export default class Table implements ITableClass {
     _startX: number|null;
     _currentRowWidth: number|null;
     _currentRow: HTMLDivElement|null;
+    _startY: number|null;
+    _currentColHeight: number|null;
+    _currentCol: HTMLSpanElement|null;
+    _currentColCells: NodeListOf<HTMLLIElement>|null;
 
     constructor(countNums: number = minCombinations) {
         this.nums = [];
@@ -28,9 +34,16 @@ export default class Table implements ITableClass {
         this.elListNums = document.querySelector(".wrapper__nums-list") as HTMLUListElement;
         this.elWrapCells = document.querySelector(".wrapper__cells") as HTMLDivElement;
 
+        // данные для ширины ряда
         this._startX = null;
         this._currentRow = null;
         this._currentRowWidth = null;
+
+        // данные для высоты колонки
+        this._startY = null;
+        this._currentCol = null;
+        this._currentColHeight = null;
+        this._currentColCells = null;
 
         if (countNums < minCombinations) {
             this._countNums = minCombinations;
@@ -134,7 +147,7 @@ export default class Table implements ITableClass {
 
         // функции для получения HTML строк ячейки и буквы
         const cellHTML = (cell: ICell): string => 
-            (`<li class="wrapper__cells-list-item" style="color: ${cell.color}; background: ${cell.background}" data-pos='${JSON.stringify(cell.position)}' contenteditable></li>`);
+            (`<li class="wrapper__cells-list-item" style="color: ${cell.color}; background: ${cell.background}" data-pos='${JSON.stringify(cell.position)}' data-letter="${cell.position[0]}" data-num="${cell.position[1]}" contenteditable></li>`);
         const cellLetterHTML = (letter: string): string => 
             `<div class="wrapper__cells-letter" data-val="${letter}">
                 <span>${letter}</span>
@@ -152,7 +165,7 @@ export default class Table implements ITableClass {
             // HTML строка контента колонки
             const rowContentHTML: string = [cellLetterHTML(this.letters[idxList]), listHTML]
                 .join("\n");
-            // HTML строка колонки с буквой и списком ячеек
+            // HTML строка ряда с буквой и списком ячеек
             const rowHTML = `<div class="wrapper__cells-row">${rowContentHTML}</div>`;
 
             this.elWrapCells.innerHTML += rowHTML;
@@ -169,7 +182,10 @@ export default class Table implements ITableClass {
         this.elListNums.style.marginTop = `${pxToVw(top)}vw`;
 
         this.nums.forEach((num) => {
-            const numHTML: string = `<li class="wrapper__nums-list-item" style="height: ${pxToVw(height)}vw" data-val="${num}">${num}</li>`;
+            const numHTML: string = `<li class="wrapper__nums-list-item" style="height: ${pxToVw(height)}vw" data-val="${num}">
+                <span>${num}</span>
+                <span class="wrapper__nums-list-item-thin"></span>
+            </li>`;
 
             this.elListNums.innerHTML += numHTML;
         });
@@ -195,11 +211,28 @@ export default class Table implements ITableClass {
         this._startX = e.pageX;
     }
 
-    // очистка данных изменяемого ширину ряда
-    _stopResizeRow(): void {
+    // фиксирование данных изменяемой высоту колонки
+    _startResizeCol(e: MouseEvent, thin: HTMLSpanElement): void {
+        const parentCol: HTMLLIElement = thin.closest(".wrapper__nums-list-item") as HTMLLIElement;
+        const num: string = parentCol.dataset.val as string;
+        const cells: NodeListOf<HTMLLIElement> = document.querySelectorAll(`.wrapper__cells-list-item[data-num="${num}"]`) as NodeListOf<HTMLLIElement>;
+
+        this._currentColHeight = parentCol.offsetHeight;
+        this._currentCol = parentCol;
+        this._startY = e.pageY;
+        this._currentColCells = cells;
+    }
+
+    // очистка данных для изменения ячеек
+    _stopResizeCells(): void {
         this._currentRowWidth = null;
         this._currentRow = null;
         this._startX = null;
+
+        this._startY = null;
+        this._currentColHeight = null;
+        this._currentCol = null;
+        this._currentColCells = null;
     }
 
     // изменение ширины ряда
@@ -216,16 +249,58 @@ export default class Table implements ITableClass {
         }
     }
 
+    // изменение высоты колонки ячеек
+    _mouseResizeColumn(e: MouseEvent): void {
+        if (this._startY === null || this._currentColHeight === null || this._currentCol === null || this._currentColCells === null) {
+            return;
+        }
+
+        const currentY: number = e.pageY;
+        const height: number = currentY - this._startY + this._currentColHeight;
+
+        if (height >= minColHeight) {
+            this._currentCol.style.height = `${pxToVw(height)}vw`;
+
+            this._currentColCells.forEach((cell) => cell.style.height = `${pxToVw(height)}vw`)
+        }
+    }
+
     // инициализация событий для изменения ширины ряда ячеек
     _initEventsToResizeRow(): void {
         const thins: NodeListOf<HTMLSpanElement> = document.querySelectorAll(".wrapper__cells-letter-thin") as NodeListOf<HTMLSpanElement>;
 
         thins.forEach((thin) => {
-           thin.addEventListener("mousedown", (e) => this._startResizeRow(e, thin)); 
+           thin.addEventListener("mousedown", (e) => this._startResizeRow(e, thin));
         });
 
+        // избавляемся от прошлого события на высоту ячеек
+        window.removeEventListener("mousemove", this._mouseResizeColumn.bind(this));
+        // добавляем новое событие на изменение ширины ряда ячеек
         window.addEventListener("mousemove", this._mouseResizeRow.bind(this));
-        window.addEventListener("mouseup", this._stopResizeRow.bind(this));
+    }
+
+    // инициализация событий для изменения высоты колонки ячеек
+    _initEventsToResizeColumn(): void {
+        const thins: NodeListOf<HTMLSpanElement> = document.querySelectorAll(".wrapper__nums-list-item-thin") as NodeListOf<HTMLSpanElement>;
+
+        thins.forEach((thin) => {
+           thin.addEventListener("mousedown", (e) => this._startResizeCol(e, thin)); 
+        });
+
+        // избавляемся от прошлого события на ширину ряда ячеек
+        window.removeEventListener("mousemove", this._mouseResizeRow.bind(this));
+        // добавляем новое событие на изменение высоты колонки ячеек
+        window.addEventListener("mousemove", this._mouseResizeColumn.bind(this));
+    }
+
+    // инициализация событий для изменения размеров ячеек
+    _initEventsToResizeCells(): void {
+        // добавление событий для изменения ширины ряда ячеек
+        this._initEventsToResizeRow();
+        // добавление событий для изменения высоты колонки ячеек
+        this._initEventsToResizeColumn();
+
+        window.addEventListener("mouseup", this._stopResizeCells.bind(this));
     }
 
     // отображение данных таблицы на странице
@@ -240,7 +315,7 @@ export default class Table implements ITableClass {
         window.removeEventListener("resize", this._resizeHandler.bind(this));
         window.addEventListener("resize", this._resizeHandler.bind(this));
 
-        // добавление событий для изменения ширины ряда ячеек
-        this._initEventsToResizeRow();
+        // добавляем события для изменения размеров ячеек
+        this._initEventsToResizeCells();
     }
 }

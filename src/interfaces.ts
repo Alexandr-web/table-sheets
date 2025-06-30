@@ -10,6 +10,10 @@ export interface ITableClass {
     _startX: number|null;
     _currentRowWidth: number|null;
     _currentRow: HTMLDivElement|null;
+    _startY: number|null;
+    _currentColHeight: number|null;
+    _currentCol: HTMLSpanElement|null;
+    _currentColCells: NodeListOf<HTMLLIElement>|null;
 
     _fillNums(): Array<number>;
     _fillCells(): Array<ICell>;
@@ -17,9 +21,13 @@ export interface ITableClass {
     _getLengthEnglishAlphabet(): number;
     _resizeHandler(): void;
     _startResizeRow(e: MouseEvent, thin: HTMLSpanElement): void;
-    _stopResizeRow(): void;
+    _startResizeCol(e: MouseEvent, thin: HTMLSpanElement): void;
+    _stopResizeCells(): void;
     _mouseResizeRow(e: MouseEvent): void;
+    _mouseResizeColumn(e: MouseEvent): void;
     _initEventsToResizeRow(): void;
+    _initEventsToResizeColumn(): void;
+    _initEventsToResizeCells(): void;
     renderCells(): void;
     renderNums(): void;
     clearNums(): void;
