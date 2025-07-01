@@ -374,7 +374,7 @@ export default class Table implements ITableClass {
     }
 
     // отображение данных таблицы на странице
-    render(data?: ITableData): void {
+    render(data?: ITableData): ITableClass {
         if (data !== undefined && Object.keys(data).length) {
             this.data = data;
         } else {
@@ -393,5 +393,7 @@ export default class Table implements ITableClass {
         this._initEventsToResizeCells();
         // сохраняем все данные таблицы в локальное хранилище
         this.saveLocalData();
+
+        return this;
     }
 }

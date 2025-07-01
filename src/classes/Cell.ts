@@ -1,14 +1,16 @@
-import { ICellClass } from "@/interfaces";
+import { ICellClass, ITableClass } from "@/interfaces";
 
 export default class Cell implements ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
     activeClassName: string;
+    table: ITableClass;
 
-    constructor() {
+    constructor(table: ITableClass) {
         this.elCells = document.querySelectorAll(".wrapper__cells-list-item") as NodeListOf<HTMLLIElement>;
         this.elLetters = document.querySelectorAll(".wrapper__cells-letter") as NodeListOf<HTMLDivElement>;
         this.activeClassName = "active";
+        this.table = table;
     }
 
     // получение элементов чисел (получаем через метод, так как они могут обновляться после изменения размеров экрана)
@@ -41,10 +43,22 @@ export default class Cell implements ICellClass {
         findActiveElNum.classList.add(this.activeClassName);
     }
 
+    _setContent(cell: HTMLLIElement): void {
+        const index: number = parseInt(cell.dataset.index as string);
+        const prevVal: string = this.table.data.cells[index].content;
+        const currentVal: string = cell.innerText;
+
+        if (prevVal !== currentVal) {
+            this.table.editCellData(index, "content", cell.innerText);
+            this.table.saveLocalData();
+        }
+    }
+
     // инициализация работы ячеек
     init(): void {
         this.elCells.forEach((cell) => {
             cell.addEventListener("focus", this._setActive.bind(this, cell));
+            cell.addEventListener("blur", this._setContent.bind(this, cell));
         });
     }
 }

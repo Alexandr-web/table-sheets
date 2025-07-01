@@ -35,17 +35,19 @@ export interface ITableClass {
     renderCells(): void;
     renderNums(): void;
     clearNums(): void;
-    render(data?: ITableData): void;
+    render(data?: ITableData): ITableClass;
 }
 
 export interface ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
     activeClassName: string;
+    table: ITableClass;
 
     _getElNums(): NodeListOf<HTMLLIElement>;
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
+    _setContent(cell: HTMLLIElement): void;
     init(): void;
 }
 
