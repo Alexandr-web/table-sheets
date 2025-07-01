@@ -2,7 +2,7 @@ import { expect, test } from "@jest/globals";
 
 import Table from "../src/classes/Table";
 import { ICell, ITableClass } from "../src/interfaces";
-import { EnglishAlphabet, Colors } from "../src/enums";
+import { EnglishAlphabet, Colors, CellSizes } from "../src/enums";
 
 describe("Тест класса Table", () => {
     test("создание экземпляра класса", () => {
@@ -66,19 +66,25 @@ describe("Тест класса Table", () => {
         const res1: ICell = {
             position: [EnglishAlphabet[0], 1],
             content: "",
+            index: 0,
             color: Colors.BLACK,
             background: Colors.WHITE,
+            width: CellSizes.DEFAULT_WIDTH,
+            height: CellSizes.DEFAULT_HEIGHT
         };
 
         const res2: ICell = {
             position: [EnglishAlphabet[0], 26],
             content: "",
+            index: 25,
             color: Colors.BLACK,
             background: Colors.WHITE,
+            width: CellSizes.DEFAULT_WIDTH,
+            height: CellSizes.DEFAULT_HEIGHT
         };
 
-        table.letters = table._fillLetters();
-        table.nums = table._fillNums();
+        table.data.letters = table._fillLetters();
+        table.data.nums = table._fillNums();
 
         const cells: Array<ICell> = table._fillCells();
 
