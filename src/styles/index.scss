@@ -178,6 +178,7 @@
                 scrollbar-width: thin;
                 overflow: auto;
                 will-change: height;
+                padding: mixins.scale(2);
 
                 &:focus,
                 &:active {

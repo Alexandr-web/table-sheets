@@ -231,6 +231,8 @@ export default class Table implements ITableClass {
     _resizeHandler(): void {
         this.clearNums();
         this.renderNums();
+
+        this._initEventsToResizeColumn();
     }
 
     // фиксирование данных изменяемого ширину ряда
