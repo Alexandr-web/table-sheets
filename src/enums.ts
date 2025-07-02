@@ -43,3 +43,10 @@ export enum CellSizes {
     DEFAULT_WIDTH = 120,
     DEFAULT_HEIGHT = 45,
 }
+
+export enum Formulas {
+    MULTIPLY = "УМНОЖИТЬ",
+    DIVIDE = "РАЗДЕЛИТЬ",
+    INCREASE = "ПЛЮС",
+    DECREASE = "МИНУС"
+}

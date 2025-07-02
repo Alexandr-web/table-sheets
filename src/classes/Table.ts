@@ -52,7 +52,7 @@ export default class Table implements ITableClass {
     _getLengthEnglishAlphabet(): number {
         return Object
             .keys(EnglishAlphabet)
-            .filter(key => isNaN(Number(key)))
+            .filter((key) => isNaN(Number(key)))
             .length;
     }
 

@@ -1,5 +1,7 @@
 import { ICellClass, ITableClass } from "@/interfaces";
 
+import getValByFormula from "@/utils/getValByFormula";
+
 export default class Cell implements ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
@@ -46,11 +48,13 @@ export default class Cell implements ICellClass {
     _setContent(cell: HTMLLIElement): void {
         const index: number = parseInt(cell.dataset.index as string);
         const prevVal: string = this.table.data.cells[index].content;
-        const currentVal: string = cell.innerText;
+        const currentVal: string = getValByFormula(cell.innerText, this.table.data.cells);
 
         if (prevVal !== currentVal) {
-            this.table.editCellData(index, "content", cell.innerText);
+            this.table.editCellData(index, "content", currentVal);
             this.table.saveLocalData();
+
+            cell.innerText = currentVal;
         }
     }
 

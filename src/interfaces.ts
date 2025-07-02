@@ -69,3 +69,10 @@ export interface ITableData {
     nums: Array<number>;
     cells: Array<ICell>;
 }
+
+export interface IFunctionName {
+    idx: number;
+    endIdx: number;
+    fullName: string;
+    name: string;
+}
