@@ -388,14 +388,29 @@ export default class Table implements ITableClass {
         localStorage.setItem("table-data", JSON.stringify(tableData));
     }
 
+    saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void {
+        const tableData: Map<string, Set<string>> = data ? data : this.cellsLinkedToFormulas;
+        const saveVal: Array<[string, string[]]> = [];
+
+        tableData.forEach((arrStr, key) => saveVal.push([key, Array.from(arrStr)]));
+
+        localStorage.setItem("formulas-cells", JSON.stringify(saveVal));
+    }
+
     // отображение данных таблицы на странице
-    render(data?: ITableData): ITableClass {
+    render(formulasCells?: Array<[string, string[]]>, data?: ITableData): ITableClass {
         if (data !== undefined && Object.keys(data).length) {
             this.data = data;
         } else {
             this.data.letters = this._fillLetters();
             this.data.nums = this._fillNums();
             this.data.cells = this._fillCells();
+        }
+
+        if (formulasCells !== undefined && formulasCells.length) {
+            formulasCells.forEach(([key, arrStr]) => {
+                this.cellsLinkedToFormulas.set(key, new Set(arrStr));
+            });
         }
 
         this.renderCells();

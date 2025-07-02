@@ -48,6 +48,7 @@ export default class Cell implements ICellClass {
     _editContent(cell: HTMLLIElement, val: string, index: number): void {
         this.table.editCellData(index, "content", val);
         this.table.saveLocalData();
+        this.table.saveCellsLinkedToFormulas();
 
         cell.innerText = val;
     }
@@ -75,11 +76,18 @@ export default class Cell implements ICellClass {
             const findIdxCell: number = this.table.data.cells.findIndex(({ position }) => JSON.stringify(position) === pos);
 
             if (findIdxCell !== -1) {
-                const newVal: string = getValByFormula(formula, this.table, this.table.data.cells[findIdxCell]);
+                const findCell: ICell = this.table.data.cells[findIdxCell];
+                const newVal: string = getValByFormula(formula, this.table, findCell);
                 const findElCell: HTMLLIElement|undefined = Array.from(this.elCells).find((el) => el.dataset.pos === pos);
 
                 if (findElCell) {
                     this._editContent(findElCell, newVal, findIdxCell);
+                }
+
+                const findFormulaCell: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
+
+                if (findFormulaCell) {
+                    return this.updateFormulaCells(findFormulaCell);
                 }
             }
         });

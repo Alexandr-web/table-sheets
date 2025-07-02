@@ -34,10 +34,11 @@ export interface ITableClass {
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
     saveLocalData(data?: ITableData): void;
+    saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void;
     renderCells(): void;
     renderNums(): void;
     clearNums(): void;
-    render(data?: ITableData): ITableClass;
+    render(formulasCells?: Array<[string, string[]]>, data?: ITableData): ITableClass;
 }
 
 export interface ICellClass {
