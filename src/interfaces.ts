@@ -4,6 +4,7 @@ export interface ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     data: ITableData;
+    cellsLinkedToFormulas: Map<string, Set<string>>;
     _countNums: number;
     _startX: number|null;
     _currentRowWidth: number|null;
@@ -30,6 +31,7 @@ export interface ITableClass {
     _initEventsToResizeRow(): void;
     _initEventsToResizeColumn(): void;
     _initEventsToResizeCells(): void;
+    addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
     saveLocalData(data?: ITableData): void;
     renderCells(): void;
@@ -48,6 +50,7 @@ export interface ICellClass {
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
     _setContent(cell: HTMLLIElement): void;
+    updateFormulaCells(cell: Set<string>): void;
     init(): void;
 }
 

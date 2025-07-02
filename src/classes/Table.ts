@@ -7,6 +7,7 @@ export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     data: ITableData;
+    cellsLinkedToFormulas: Map<string, Set<string>>;
     _countNums: number;
     _startX: number|null;
     _currentRowWidth: number|null;
@@ -18,6 +19,7 @@ export default class Table implements ITableClass {
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
 
     constructor(countNums: number = CombinationsLetters.MIN) {
+        this.cellsLinkedToFormulas = new Map<string, Set<string>>();
         this.data = {
             letters: [],
             nums: [],
@@ -139,6 +141,19 @@ export default class Table implements ITableClass {
         }
 
         return result;
+    }
+
+    addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void {
+        const findCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
+        const valCell: string = `${posFormulaCell}|${formula}`;
+
+        if (findCell && !findCell.has(valCell)) {
+            findCell.add(valCell);
+
+            this.cellsLinkedToFormulas.set(posLinkedCell, findCell);
+        } else {
+            this.cellsLinkedToFormulas.set(posLinkedCell, new Set<string>([valCell]));
+        }
     }
 
     // добавление ячеек в таблицу

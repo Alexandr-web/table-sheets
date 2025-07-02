@@ -1,4 +1,4 @@
-import { ICellClass, ITableClass } from "@/interfaces";
+import { ICellClass, ITableClass, ICell } from "@/interfaces";
 
 import getValByFormula from "@/utils/getValByFormula";
 
@@ -45,17 +45,44 @@ export default class Cell implements ICellClass {
         findActiveElNum.classList.add(this.activeClassName);
     }
 
+    _editContent(cell: HTMLLIElement, val: string, index: number): void {
+        this.table.editCellData(index, "content", val);
+        this.table.saveLocalData();
+
+        cell.innerText = val;
+    }
+
     _setContent(cell: HTMLLIElement): void {
         const index: number = parseInt(cell.dataset.index as string);
-        const prevVal: string = this.table.data.cells[index].content;
-        const currentVal: string = getValByFormula(cell.innerText, this.table.data.cells);
+        const currentCell: ICell = this.table.data.cells[index] as ICell;
+        const pos: string = JSON.stringify(currentCell.position);
+        const prevVal: string = currentCell.content;
+        const currentVal: string = getValByFormula(cell.innerText, this.table, currentCell);
+        const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
         if (prevVal !== currentVal) {
-            this.table.editCellData(index, "content", currentVal);
-            this.table.saveLocalData();
+            this._editContent(cell, currentVal, index);
 
-            cell.innerText = currentVal;
+            if (findCellInFormulas) {
+                this.updateFormulaCells(findCellInFormulas);
+            }
         }
+    }
+
+    updateFormulaCells(cell: Set<string>): void {
+        cell.forEach((str) => {
+            const [pos, formula] = str.split("|");
+            const findIdxCell: number = this.table.data.cells.findIndex(({ position }) => JSON.stringify(position) === pos);
+
+            if (findIdxCell !== -1) {
+                const newVal: string = getValByFormula(formula, this.table, this.table.data.cells[findIdxCell]);
+                const findElCell: HTMLLIElement|undefined = Array.from(this.elCells).find((el) => el.dataset.pos === pos);
+
+                if (findElCell) {
+                    this._editContent(findElCell, newVal, findIdxCell);
+                }
+            }
+        });
     }
 
     // инициализация работы ячеек
