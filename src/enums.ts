@@ -50,3 +50,7 @@ export enum Formulas {
     INCREASE = "ПЛЮС",
     DECREASE = "МИНУС"
 }
+
+export enum LogErrors {
+    NOT_FOUND_CELL_BY_POS = "Ячеек с такой позицией не найдено",
+}

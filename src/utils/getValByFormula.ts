@@ -1,5 +1,6 @@
 import { ICell, IFunctionName } from "@/interfaces";
-import { Formulas } from "@/enums";
+import { Formulas, LogErrors } from "@/enums";
+import { TCellPos } from "@/types";
 
 const decrease = (args: Array<string>): string => (parseFloat(args[0]) - parseFloat(args[1])).toString();
 const divide = (args: Array<string>): string => (parseFloat(args[0]) / parseFloat(args[1])).toString();
@@ -33,14 +34,33 @@ const getFunctionsNames = (str: string): Array<IFunctionName> => {
     return functions;
 }
 
-const getFunctionArgs = (functionName: IFunctionName): Array<string> => {
-    const argsFromBrackets: RegExpMatchArray | null = functionName.fullName.match(/(?<=\().*(?=\))/);
+const getFunctionArgs = (functionName: IFunctionName, cells: Array<ICell>): Array<string> => {
+    const argsFromBrackets: RegExpMatchArray|null = functionName.fullName.match(/(?<=\().*(?=\))/);
 
     if (argsFromBrackets === null) {
         return ["", ""];
     }
 
-    return argsFromBrackets[0].split(";");
+    const args: Array<string> = argsFromBrackets[0].split(";");
+
+    return args.map((arg) => {
+        if (!/[A-Z]+\d+/.test(arg)) {
+            return arg;
+        }
+
+        const letter: string = (arg.match(/[A-Z]+/) as RegExpMatchArray)[0];
+        const num: number = parseInt((arg.match(/\d+/) as RegExpMatchArray)[0]);
+        const findPos: TCellPos = [letter, num];
+        const findCell: ICell|undefined = cells.find(({ position }) => JSON.stringify(position) === JSON.stringify(findPos));
+
+        if (!findCell) {
+            console.error(LogErrors.NOT_FOUND_CELL_BY_POS, findPos);
+
+            return arg;
+        }
+
+        return findCell.content;
+    });
 }
 
 const getFunctionVal = (name: string, argsFunc: Array<string>): string => {
@@ -73,7 +93,7 @@ const getValByFormula = (content: string, cells: Array<ICell>, currentStr?: stri
     const functions: Array<IFunctionName> = getFunctionsNames(str);
     const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
     const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
-    const argsFunc: Array<string> = getFunctionArgs(findLastFunc);
+    const argsFunc: Array<string> = getFunctionArgs(findLastFunc, cells);
     const valFunc: string = getFunctionVal(findLastFunc.name, argsFunc);
 
     if (functions.length === 1) {
