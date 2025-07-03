@@ -54,6 +54,7 @@ export interface ICellClass {
     _setActive(cell: HTMLLIElement): void;
     _setContent(cell: HTMLLIElement): void;
     updateFormulaCells(cell: Set<string>): void;
+    checkFormulaCellToLinked(pos: string): void;
     init(): void;
 }
 

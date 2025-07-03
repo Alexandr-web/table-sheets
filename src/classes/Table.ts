@@ -148,12 +148,12 @@ export default class Table implements ITableClass {
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void {
         const findCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
         const valCell: string = `${posFormulaCell}|${formula}`;
-
+        
         if (findCell && !findCell.has(valCell)) {
             findCell.add(valCell);
 
             this.cellsLinkedToFormulas.set(posLinkedCell, findCell);
-        } else {
+        } else if (!findCell) {
             this.cellsLinkedToFormulas.set(posLinkedCell, new Set<string>([valCell]));
         }
     }

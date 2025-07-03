@@ -82,7 +82,7 @@ export default class Cell implements ICellClass {
     }
 
     // проверка на существование ячейки в связанном списке ячеек, что участвуют в формулах/функциях
-    checkFormulaCellToLinked(pos: string) {
+    checkFormulaCellToLinked(pos: string): void {
         Array.from(this.table.cellsLinkedToFormulas).forEach(([key, setStrs]) => {
             const findFormulaCell: string|undefined = Array
                 .from(setStrs)
