@@ -180,6 +180,10 @@
                 will-change: height;
                 padding: mixins.scale(2);
 
+                &.updating {
+                    animation: opacity-anim .5s linear;
+                }
+
                 &:focus,
                 &:active {
                     opacity: 1;
@@ -219,4 +223,14 @@
     right: 0;
     transform: translateX(100%);
     z-index: 99;
+}
+
+@keyframes opacity-anim {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

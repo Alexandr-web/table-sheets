@@ -4,6 +4,7 @@ export interface ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     data: ITableData;
+    cellsLinkedToFormulas: Map<string, Set<string>>;
     _countNums: number;
     _startX: number|null;
     _currentRowWidth: number|null;
@@ -30,22 +31,30 @@ export interface ITableClass {
     _initEventsToResizeRow(): void;
     _initEventsToResizeColumn(): void;
     _initEventsToResizeCells(): void;
+    addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
+    removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void;
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
     saveLocalData(data?: ITableData): void;
+    saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void;
     renderCells(): void;
     renderNums(): void;
     clearNums(): void;
-    render(data?: ITableData): void;
+    render(formulasCells?: Array<[string, string[]]>, data?: ITableData): ITableClass;
 }
 
 export interface ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
     activeClassName: string;
+    updatingClassName: string;
+    table: ITableClass;
 
     _getElNums(): NodeListOf<HTMLLIElement>;
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
+    _setContent(cell: HTMLLIElement): void;
+    updateFormulaCells(cell: Set<string>): void;
+    checkFormulaCellToLinked(pos: string): void;
     init(): void;
 }
 
@@ -66,4 +75,11 @@ export interface ITableData {
     letters: Array<string>;
     nums: Array<number>;
     cells: Array<ICell>;
+}
+
+export interface IFunctionName {
+    idx: number;
+    endIdx: number;
+    fullName: string;
+    name: string;
 }

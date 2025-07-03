@@ -1,12 +1,13 @@
 import { ITableClass, ITableData, ICell, ICellStyles } from "@/interfaces";
 import { EnglishAlphabet, Colors, CombinationsLetters, CellSizes } from "@/enums";
-import { TAccumulatorCells } from "@/types";
+import { TAccumulatorCells, TCellsLinkedToFormulas } from "@/types";
 import pxToVw from "@/utils/pxToVw";
 
 export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     data: ITableData;
+    cellsLinkedToFormulas: TCellsLinkedToFormulas;
     _countNums: number;
     _startX: number|null;
     _currentRowWidth: number|null;
@@ -18,6 +19,8 @@ export default class Table implements ITableClass {
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
 
     constructor(countNums: number = CombinationsLetters.MIN) {
+        // список, содержащий ячейки, привязанные друг к другу с помощью формул/функций
+        this.cellsLinkedToFormulas = new Map<string, Set<string>>();
         this.data = {
             letters: [],
             nums: [],
@@ -52,7 +55,7 @@ export default class Table implements ITableClass {
     _getLengthEnglishAlphabet(): number {
         return Object
             .keys(EnglishAlphabet)
-            .filter(key => isNaN(Number(key)))
+            .filter((key) => isNaN(Number(key)))
             .length;
     }
 
@@ -139,6 +142,34 @@ export default class Table implements ITableClass {
         }
 
         return result;
+    }
+
+    // добавление ячейки, которая участвует в формуле/функции и ячейки, в которой данная формула/функция осуществляется
+    addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void {
+        const findCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
+        const valCell: string = `${posFormulaCell}|${formula}`;
+        
+        if (findCell && !findCell.has(valCell)) {
+            findCell.add(valCell);
+
+            this.cellsLinkedToFormulas.set(posLinkedCell, findCell);
+        } else if (!findCell) {
+            this.cellsLinkedToFormulas.set(posLinkedCell, new Set<string>([valCell]));
+        }
+    }
+
+    // удаление ячейки, в которой осуществляется формула/функция
+    removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void {
+        const findLinkedCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
+
+        if (findLinkedCell) {
+            findLinkedCell.delete(valFormulaCell);
+
+            // также удаяем ячейку, что участвует в формуле/функции
+            if (!findLinkedCell.size) {
+                this.cellsLinkedToFormulas.delete(posLinkedCell);
+            }
+        }
     }
 
     // добавление ячеек в таблицу
@@ -373,14 +404,30 @@ export default class Table implements ITableClass {
         localStorage.setItem("table-data", JSON.stringify(tableData));
     }
 
+    // сохранение данных ячеек, что участвуют в формулах/функциях
+    saveCellsLinkedToFormulas(data?: TCellsLinkedToFormulas): void {
+        const tableData: TCellsLinkedToFormulas = data ? data : this.cellsLinkedToFormulas;
+        const saveVal: Array<[string, string[]]> = [];
+
+        tableData.forEach((arrStr, key) => saveVal.push([key, Array.from(arrStr)]));
+
+        localStorage.setItem("formulas-cells", JSON.stringify(saveVal));
+    }
+
     // отображение данных таблицы на странице
-    render(data?: ITableData): void {
+    render(formulasCells?: Array<[string, string[]]>, data?: ITableData): ITableClass {
         if (data !== undefined && Object.keys(data).length) {
             this.data = data;
         } else {
             this.data.letters = this._fillLetters();
             this.data.nums = this._fillNums();
             this.data.cells = this._fillCells();
+        }
+
+        if (formulasCells !== undefined && formulasCells.length) {
+            formulasCells.forEach(([key, arrStr]) => {
+                this.cellsLinkedToFormulas.set(key, new Set(arrStr));
+            });
         }
 
         this.renderCells();
@@ -393,5 +440,7 @@ export default class Table implements ITableClass {
         this._initEventsToResizeCells();
         // сохраняем все данные таблицы в локальное хранилище
         this.saveLocalData();
+
+        return this;
     }
 }

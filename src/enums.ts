@@ -43,3 +43,16 @@ export enum CellSizes {
     DEFAULT_WIDTH = 120,
     DEFAULT_HEIGHT = 45,
 }
+
+export enum Formulas {
+    MULTIPLY = "УМНОЖИТЬ",
+    DIVIDE = "РАЗДЕЛИТЬ",
+    INCREASE = "ПЛЮС",
+    DECREASE = "МИНУС"
+}
+
+export enum LogErrors {
+    NOT_FOUND_CELL_BY_POS = "Ячеек с такой позицией не найдено",
+    INVALID_FORMULA = "Неверная запись функции",
+    ERROR_NAME = "Ошибка/неверная запись"
+}
