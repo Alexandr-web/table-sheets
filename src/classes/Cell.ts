@@ -6,12 +6,14 @@ export default class Cell implements ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
     activeClassName: string;
+    updatingClassName: string;
     table: ITableClass;
 
     constructor(table: ITableClass) {
         this.elCells = document.querySelectorAll(".wrapper__cells-list-item") as NodeListOf<HTMLLIElement>;
         this.elLetters = document.querySelectorAll(".wrapper__cells-letter") as NodeListOf<HTMLDivElement>;
         this.activeClassName = "active";
+        this.updatingClassName = "updating";
         this.table = table;
     }
 
@@ -106,6 +108,8 @@ export default class Cell implements ICellClass {
                 // обновление содержания ячейки, что содержит текущую в своей формуле/функции
                 if (findElCell) {
                     this._editContent(findElCell, newVal, findIdxCell);
+
+                    findElCell.classList.add(this.updatingClassName);
                 }
 
                 // также проводим еще одно обновление ячеек, что потенциально может содержать ячейка
@@ -123,6 +127,7 @@ export default class Cell implements ICellClass {
         this.elCells.forEach((cell) => {
             cell.addEventListener("focus", this._setActive.bind(this, cell));
             cell.addEventListener("blur", this._setContent.bind(this, cell));
+            cell.addEventListener("animationend", () => cell.classList.remove(this.updatingClassName));
         });
     }
 }

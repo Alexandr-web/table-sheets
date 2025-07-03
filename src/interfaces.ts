@@ -46,6 +46,7 @@ export interface ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
     elLetters: NodeListOf<HTMLDivElement>;
     activeClassName: string;
+    updatingClassName: string;
     table: ITableClass;
 
     _getElNums(): NodeListOf<HTMLLIElement>;
