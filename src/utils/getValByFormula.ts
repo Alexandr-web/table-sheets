@@ -2,13 +2,20 @@ import { ICell, IFunctionName, ITableClass } from "@/interfaces";
 import { Formulas, LogErrors } from "@/enums";
 import { TCellPos } from "@/types";
 
+// математические функции
+// минус
 const decrease = (args: Array<string>): string => (parseFloat(args[0]) - parseFloat(args[1])).toString();
+// разделить
 const divide = (args: Array<string>): string => (parseFloat(args[0]) / parseFloat(args[1])).toString();
+// плюс
 const increase = (args: Array<string>): string => (parseFloat(args[0]) + parseFloat(args[1])).toString();
+// умножить
 const multiply = (args: Array<string>): string => (parseFloat(args[0]) * parseFloat(args[1])).toString();
 
+// список всех возможных функций
 const possibleFunctions: Array<string> = Object.values(Formulas).filter((key) => isNaN(Number(key)));
 
+// получение названий функций, участвующих в ячейке
 const getFunctionsNames = (str: string): Array<IFunctionName> => {
     const functions: Array<IFunctionName> = [];
 
@@ -34,6 +41,7 @@ const getFunctionsNames = (str: string): Array<IFunctionName> => {
     return functions;
 }
 
+// определение аргументов функции ячейки
 const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, currentCell: ICell, formula: string): Array<string> => {
     const argsFromBrackets: RegExpMatchArray|null = functionName.fullName.match(/(?<=\().*(?=\))/);
 
@@ -48,6 +56,7 @@ const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, curren
             return arg;
         }
 
+        // проверка на ссылки на другие ячейки
         const letter: string = (arg.match(/[A-Z]+/) as RegExpMatchArray)[0];
         const num: number = parseInt((arg.match(/\d+/) as RegExpMatchArray)[0]);
         const findPos: TCellPos = [letter, num];
@@ -59,12 +68,14 @@ const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, curren
             return arg;
         }
 
+        // добавление найденных ячеек в общий список
         table.addCellToFormulasList(JSON.stringify(findPos), JSON.stringify(currentCell.position), formula);
 
         return findCell.content;
     });
 }
 
+// получение значения функции
 const getFunctionVal = (name: string, argsFunc: Array<string>): string => {
     if (possibleFunctions.includes(name)) {
         switch (name) {
@@ -82,29 +93,43 @@ const getFunctionVal = (name: string, argsFunc: Array<string>): string => {
     return "";
 }
 
+// замена функции на ее значение в общей строке
 const getNewStr = (funcName: IFunctionName, valFunc: string, str: string): string => {
     return str.replace(funcName.fullName, valFunc);
 }
 
+// получение значения всей формулы/функции, применяемой в ячейке
 const getValByFormula = (content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string => {
-    if (content[0] !== "=") {
-        return content;
+    try {
+        if (content[0] !== "=") {
+            return content;
+        }
+
+        // 1. находим самую "нижнюю" (последнюю) функцию
+        // 2. определяем ее аргументы
+        // 3. определяем ее значение
+        // 4. меняем, если требуется, ее на ее значение в общей строке
+
+        const str: string = currentStr || content;
+        const functions: Array<IFunctionName> = getFunctionsNames(str);
+        const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
+        const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
+        const argsFunc: Array<string> = getFunctionArgs(findLastFunc, table, currentCell, content);
+        const valFunc: string = getFunctionVal(findLastFunc.name, argsFunc);
+
+        if (functions.length === 1) {
+            return valFunc;
+        }
+
+        const newStr: string = getNewStr(findLastFunc, valFunc, str);
+
+        return getValByFormula(content, table, currentCell, newStr);
+    } catch (err) {
+        console.error(err);
+        console.error(LogErrors.INVALID_FORMULA, content);
+
+        return LogErrors.ERROR_NAME;
     }
-
-    const str: string = currentStr || content;
-    const functions: Array<IFunctionName> = getFunctionsNames(str);
-    const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
-    const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
-    const argsFunc: Array<string> = getFunctionArgs(findLastFunc, table, currentCell, content);
-    const valFunc: string = getFunctionVal(findLastFunc.name, argsFunc);
-
-    if (functions.length === 1) {
-        return valFunc;
-    }
-
-    const newStr: string = getNewStr(findLastFunc, valFunc, str);
-
-    return getValByFormula(content, table, currentCell, newStr);
 }
 
 export default getValByFormula;

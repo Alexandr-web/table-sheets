@@ -32,6 +32,7 @@ export interface ITableClass {
     _initEventsToResizeColumn(): void;
     _initEventsToResizeCells(): void;
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
+    removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void;
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
     saveLocalData(data?: ITableData): void;
     saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void;

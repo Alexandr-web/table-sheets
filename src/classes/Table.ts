@@ -1,13 +1,13 @@
 import { ITableClass, ITableData, ICell, ICellStyles } from "@/interfaces";
 import { EnglishAlphabet, Colors, CombinationsLetters, CellSizes } from "@/enums";
-import { TAccumulatorCells } from "@/types";
+import { TAccumulatorCells, TCellsLinkedToFormulas } from "@/types";
 import pxToVw from "@/utils/pxToVw";
 
 export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
     elWrapCells: HTMLDivElement;
     data: ITableData;
-    cellsLinkedToFormulas: Map<string, Set<string>>;
+    cellsLinkedToFormulas: TCellsLinkedToFormulas;
     _countNums: number;
     _startX: number|null;
     _currentRowWidth: number|null;
@@ -19,6 +19,7 @@ export default class Table implements ITableClass {
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
 
     constructor(countNums: number = CombinationsLetters.MIN) {
+        // список, содержащий ячейки, привязанные друг к другу с помощью формул/функций
         this.cellsLinkedToFormulas = new Map<string, Set<string>>();
         this.data = {
             letters: [],
@@ -143,6 +144,7 @@ export default class Table implements ITableClass {
         return result;
     }
 
+    // добавление ячейки, которая участвует в формуле/функции и ячейки, в которой данная формула/функция осуществляется
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void {
         const findCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
         const valCell: string = `${posFormulaCell}|${formula}`;
@@ -153,6 +155,20 @@ export default class Table implements ITableClass {
             this.cellsLinkedToFormulas.set(posLinkedCell, findCell);
         } else {
             this.cellsLinkedToFormulas.set(posLinkedCell, new Set<string>([valCell]));
+        }
+    }
+
+    // удаление ячейки, в которой осуществляется формула/функция
+    removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void {
+        const findLinkedCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
+
+        if (findLinkedCell) {
+            findLinkedCell.delete(valFormulaCell);
+
+            // также удаяем ячейку, что участвует в формуле/функции
+            if (!findLinkedCell.size) {
+                this.cellsLinkedToFormulas.delete(posLinkedCell);
+            }
         }
     }
 
@@ -388,8 +404,9 @@ export default class Table implements ITableClass {
         localStorage.setItem("table-data", JSON.stringify(tableData));
     }
 
-    saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void {
-        const tableData: Map<string, Set<string>> = data ? data : this.cellsLinkedToFormulas;
+    // сохранение данных ячеек, что участвуют в формулах/функциях
+    saveCellsLinkedToFormulas(data?: TCellsLinkedToFormulas): void {
+        const tableData: TCellsLinkedToFormulas = data ? data : this.cellsLinkedToFormulas;
         const saveVal: Array<[string, string[]]> = [];
 
         tableData.forEach((arrStr, key) => saveVal.push([key, Array.from(arrStr)]));

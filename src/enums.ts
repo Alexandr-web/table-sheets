@@ -53,4 +53,6 @@ export enum Formulas {
 
 export enum LogErrors {
     NOT_FOUND_CELL_BY_POS = "Ячеек с такой позицией не найдено",
+    INVALID_FORMULA = "Неверная запись функции",
+    ERROR_NAME = "Ошибка/неверная запись"
 }

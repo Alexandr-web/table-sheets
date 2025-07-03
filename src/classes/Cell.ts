@@ -45,6 +45,7 @@ export default class Cell implements ICellClass {
         findActiveElNum.classList.add(this.activeClassName);
     }
 
+    // изменение содержимого ячейки
     _editContent(cell: HTMLLIElement, val: string, index: number): void {
         this.table.editCellData(index, "content", val);
         this.table.saveLocalData();
@@ -53,14 +54,22 @@ export default class Cell implements ICellClass {
         cell.innerText = val;
     }
 
+    // определение содержимого ячейки
     _setContent(cell: HTMLLIElement): void {
         const index: number = parseInt(cell.dataset.index as string);
         const currentCell: ICell = this.table.data.cells[index] as ICell;
         const pos: string = JSON.stringify(currentCell.position);
         const prevVal: string = currentCell.content;
+
+        // проверка на существование этой ячейки в связанном списке ячеек, что участвуют в формулах/функциях
+        if (prevVal !== cell.innerText) {
+            this.checkFormulaCellToLinked(pos);
+        }
+
         const currentVal: string = getValByFormula(cell.innerText, this.table, currentCell);
         const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
+        // изменение содержания ячейки
         if (prevVal !== currentVal) {
             this._editContent(cell, currentVal, index);
 
@@ -70,6 +79,20 @@ export default class Cell implements ICellClass {
         }
     }
 
+    // проверка на существование ячейки в связанном списке ячеек, что участвуют в формулах/функциях
+    checkFormulaCellToLinked(pos: string) {
+        Array.from(this.table.cellsLinkedToFormulas).forEach(([key, setStrs]) => {
+            const findFormulaCell: string|undefined = Array
+                .from(setStrs)
+                .find((str) => str.split("|")[0] === pos);
+
+            if (findFormulaCell) {
+                this.table.removeCellFromFormulasList(key, findFormulaCell);
+            }
+        });
+    }
+
+    // обновление всех связанных ячеек, что содержат данную ячейку в своей формуле/функции
     updateFormulaCells(cell: Set<string>): void {
         cell.forEach((str) => {
             const [pos, formula] = str.split("|");
@@ -80,10 +103,12 @@ export default class Cell implements ICellClass {
                 const newVal: string = getValByFormula(formula, this.table, findCell);
                 const findElCell: HTMLLIElement|undefined = Array.from(this.elCells).find((el) => el.dataset.pos === pos);
 
+                // обновление содержания ячейки, что содержит текущую в своей формуле/функции
                 if (findElCell) {
                     this._editContent(findElCell, newVal, findIdxCell);
                 }
 
+                // также проводим еще одно обновление ячеек, что потенциально может содержать ячейка
                 const findFormulaCell: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
                 if (findFormulaCell) {
