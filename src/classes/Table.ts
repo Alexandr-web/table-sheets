@@ -2,6 +2,7 @@ import { ITableClass, ITableData, ICell, ICellStyles } from "@/interfaces";
 import { EnglishAlphabet, Colors, CombinationsLetters, CellSizes } from "@/enums";
 import { TAccumulatorCells, TCellsLinkedToFormulas } from "@/types";
 import pxToVw from "@/utils/pxToVw";
+import getValByFormula from "@/utils/getValByFormula";
 
 export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
@@ -67,7 +68,11 @@ export default class Table implements ITableClass {
         return this.data.nums;
     }
 
-    _getCells(): Array<ICell> {
+    _getCells(getElements?: boolean): Array<ICell>|NodeListOf<HTMLLIElement> {
+        if (getElements) {
+            return document.querySelectorAll(".wrapper__cells-list-item");
+        }
+
         return this.data.cells;
     }
 
@@ -158,6 +163,50 @@ export default class Table implements ITableClass {
         }
     }
 
+    // проверка на существование ячейки в связанном списке ячеек, что участвуют в формулах/функциях
+    checkFormulaCellToLinked(pos: string, currentVal: string, prevVal: string): void {
+        Array.from(this.cellsLinkedToFormulas).forEach(([key, setStrs]) => {
+            const findFormulaCell: string|undefined = Array
+                .from(setStrs)
+                .find((str) => str.split("|")[0] === pos);
+
+            if (findFormulaCell && currentVal !== prevVal) {
+                this.removeCellFromFormulasList(key, findFormulaCell);
+            }
+        });
+    }
+
+    // обновление всех связанных ячеек, что содержат данную ячейку в своей формуле/функции
+    updateFormulaCells(cell: Set<string>, updatingClassName: string): void {
+        const cells: Array<ICell> = this._getCells() as Array<ICell>;
+        const elCells: NodeListOf<HTMLLIElement> = this._getCells(true) as NodeListOf<HTMLLIElement>;
+
+        cell.forEach((str) => {
+            const [pos, formula] = str.split("|");
+            const findIdxCell: number = cells.findIndex(({ position }) => JSON.stringify(position) === pos);
+
+            if (findIdxCell !== -1) {
+                const findCell: ICell = cells[findIdxCell];
+                const newVal: string = getValByFormula(formula, this, findCell);
+                const findElCell: HTMLLIElement|undefined = Array.from(elCells).find((el) => el.dataset.pos === pos);
+
+                // обновление содержания ячейки, что содержит текущую в своей формуле/функции
+                if (findElCell) {
+                    this._editCellContent(findElCell, newVal, findIdxCell);
+
+                    findElCell.classList.add(updatingClassName);
+                }
+
+                // также проводим еще одно обновление ячеек, что потенциально может содержать ячейка
+                const findFormulaCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(pos);
+
+                if (findFormulaCell) {
+                    return this.updateFormulaCells(findFormulaCell, "updating");
+                }
+            }
+        });
+    }
+
     // удаление ячейки, в которой осуществляется формула/функция
     removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void {
         const findLinkedCell: Set<string>|undefined = this.cellsLinkedToFormulas.get(posLinkedCell);
@@ -174,7 +223,7 @@ export default class Table implements ITableClass {
 
     // добавление ячеек в таблицу
     renderCells(): void {
-        const cells: Array<ICell> = this._getCells();
+        const cells: Array<ICell> = this._getCells() as Array<ICell>;
         const letters: Array<string> = this._getLetters();
 
         // сортировка массива всех ячеек в двумерный массив, где каждый массив содержит ячейки одной буквы
@@ -412,6 +461,15 @@ export default class Table implements ITableClass {
         tableData.forEach((arrStr, key) => saveVal.push([key, Array.from(arrStr)]));
 
         localStorage.setItem("formulas-cells", JSON.stringify(saveVal));
+    }
+
+    // изменение содержимого ячейки
+    _editCellContent(cell: HTMLLIElement, val: string, index: number): void {
+        this.editCellData(index, "content", val);
+        this.saveLocalData();
+        this.saveCellsLinkedToFormulas();
+
+        cell.innerText = val;
     }
 
     // отображение данных таблицы на странице

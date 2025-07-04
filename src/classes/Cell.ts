@@ -1,4 +1,4 @@
-import { ICellClass, ITableClass, ICell } from "@/interfaces";
+import { ICellClass, ITableClass, ICell, IInputClass } from "@/interfaces";
 
 import getValByFormula from "@/utils/getValByFormula";
 
@@ -8,13 +8,15 @@ export default class Cell implements ICellClass {
     activeClassName: string;
     updatingClassName: string;
     table: ITableClass;
+    input: IInputClass;
 
-    constructor(table: ITableClass) {
+    constructor(table: ITableClass, input: IInputClass) {
         this.elCells = document.querySelectorAll(".wrapper__cells-list-item") as NodeListOf<HTMLLIElement>;
         this.elLetters = document.querySelectorAll(".wrapper__cells-letter") as NodeListOf<HTMLDivElement>;
         this.activeClassName = "active";
         this.updatingClassName = "updating";
         this.table = table;
+        this.input = input;
     }
 
     // получение элементов чисел (получаем через метод, так как они могут обновляться после изменения размеров экрана)
@@ -31,7 +33,9 @@ export default class Cell implements ICellClass {
 
     // добавление активного класса выбранной ячейке, букве и числу
     _setActive(cell: HTMLLIElement): void {
-        const [activeLetter, activeNum] = JSON.parse((cell.dataset.pos as string));
+        const [activeLetter, activeNum] = JSON.parse(cell.dataset.pos as string);
+        const index: number = parseInt(cell.dataset.index as string);
+        const findCell: ICell = this.table.data.cells[index];
         const findActiveElLetter: HTMLDivElement = Array
             .from(this.elLetters)
             .find((el) => el.dataset.val === activeLetter) as HTMLDivElement;
@@ -45,15 +49,9 @@ export default class Cell implements ICellClass {
 
         findActiveElLetter.classList.add(this.activeClassName);
         findActiveElNum.classList.add(this.activeClassName);
-    }
 
-    // изменение содержимого ячейки
-    _editContent(cell: HTMLLIElement, val: string, index: number): void {
-        this.table.editCellData(index, "content", val);
-        this.table.saveLocalData();
-        this.table.saveCellsLinkedToFormulas();
-
-        cell.innerText = val;
+        // добавляем содержание ячейки в инпут
+        this.input.setValue(findCell);
     }
 
     // определение содержимого ячейки
@@ -64,62 +62,19 @@ export default class Cell implements ICellClass {
         const prevVal: string = currentCell.content;
 
         // проверка на существование этой ячейки в связанном списке ячеек, что участвуют в формулах/функциях
-        if (prevVal !== cell.innerText) {
-            this.checkFormulaCellToLinked(pos);
-        }
+        this.table.checkFormulaCellToLinked(pos, cell.innerText, prevVal);
 
         const currentVal: string = getValByFormula(cell.innerText, this.table, currentCell);
         const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
-        // изменение содержания ячейки
         if (prevVal !== currentVal) {
-            this._editContent(cell, currentVal, index);
+            // изменение содержимого ячейки
+            this.table._editCellContent(cell, currentVal, index);
 
             if (findCellInFormulas) {
-                this.updateFormulaCells(findCellInFormulas);
+                this.table.updateFormulaCells(findCellInFormulas, "updating");
             }
         }
-    }
-
-    // проверка на существование ячейки в связанном списке ячеек, что участвуют в формулах/функциях
-    checkFormulaCellToLinked(pos: string): void {
-        Array.from(this.table.cellsLinkedToFormulas).forEach(([key, setStrs]) => {
-            const findFormulaCell: string|undefined = Array
-                .from(setStrs)
-                .find((str) => str.split("|")[0] === pos);
-
-            if (findFormulaCell) {
-                this.table.removeCellFromFormulasList(key, findFormulaCell);
-            }
-        });
-    }
-
-    // обновление всех связанных ячеек, что содержат данную ячейку в своей формуле/функции
-    updateFormulaCells(cell: Set<string>): void {
-        cell.forEach((str) => {
-            const [pos, formula] = str.split("|");
-            const findIdxCell: number = this.table.data.cells.findIndex(({ position }) => JSON.stringify(position) === pos);
-
-            if (findIdxCell !== -1) {
-                const findCell: ICell = this.table.data.cells[findIdxCell];
-                const newVal: string = getValByFormula(formula, this.table, findCell);
-                const findElCell: HTMLLIElement|undefined = Array.from(this.elCells).find((el) => el.dataset.pos === pos);
-
-                // обновление содержания ячейки, что содержит текущую в своей формуле/функции
-                if (findElCell) {
-                    this._editContent(findElCell, newVal, findIdxCell);
-
-                    findElCell.classList.add(this.updatingClassName);
-                }
-
-                // также проводим еще одно обновление ячеек, что потенциально может содержать ячейка
-                const findFormulaCell: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
-
-                if (findFormulaCell) {
-                    return this.updateFormulaCells(findFormulaCell);
-                }
-            }
-        });
     }
 
     // инициализация работы ячеек

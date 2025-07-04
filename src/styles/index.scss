@@ -26,10 +26,31 @@
         flex-direction: column;
     }
 
+    &__area {
+        width: 100%;
+        height: mixins.scale(20);
+
+        &-input {
+            width: 100%;
+            height: 100%;
+            border-radius: mixins.scale(5);
+            border: none;
+            padding: mixins.scale(10);
+            font-family: "Open Sans";
+
+            &:focus {
+                outline: mixins.scale(1) solid vars.$blue-1;
+            }
+        }
+    }
+
     &__header {
         background-color: vars.$light-gray-1;
         border-radius: mixins.scale(10);
         padding: mixins.scale(10);
+        display: flex;
+        align-items: center;
+        gap: mixins.scale(40);
     }
 
     &__main {
