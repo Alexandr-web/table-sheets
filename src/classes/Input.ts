@@ -51,11 +51,12 @@ export default class Input implements IInputClass {
 
     // изменение содержимого текущей ячейки
     _blurHandler(): void {
-        if (!this.activeCell) {
+        const inputVal: string = this._getValue();
+
+        if (!this.activeCell || this.activeCell.content === inputVal) {
             return;
         }
 
-        const inputVal: string = this._getValue();
         const pos: string = JSON.stringify(this.activeCell.position);
         const index: number = this.activeCell.index;
         const elCell: HTMLLIElement = document.querySelector(`.wrapper__cells-list-item[data-index="${index}"]`) as HTMLLIElement;
