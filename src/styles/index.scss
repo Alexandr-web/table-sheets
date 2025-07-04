@@ -34,9 +34,11 @@
             width: 100%;
             height: 100%;
             border-radius: mixins.scale(5);
-            border: none;
+            background-color: transparent;
+            border: mixins.scale(1) solid vars.$light-gray-2;
             padding: mixins.scale(2);
             font-family: "Open Sans";
+            font-size: mixins.scale(8);
 
             &:focus {
                 outline: mixins.scale(1) solid vars.$blue-1;
