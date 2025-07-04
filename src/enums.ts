@@ -57,5 +57,6 @@ export enum LogErrors {
     NOT_FOUND_FORMULA = "Не найдено ни одной функции",
     IMPOSSIBLE_MATHEMATICAL_OPERATION = "Невозможная математическая операция",
     NOT_FOUND_FORMULA_ARGUMENTS = "Не найдено аргументов функции",
+    INVALID_FORMULA_ARGUMENT = "Не подходящий аргумент функции",
     ERROR_NAME = "Ошибка/неверная запись"
 }

@@ -9,6 +9,7 @@ const decrease = (args: Array<string>): string => (parseFloat(args[0]) - parseFl
 const divide = (args: Array<string>): string|never => {
     const res: number = parseFloat(args[0]) / parseFloat(args[1]);
 
+    // деление на 0
     if (res === Infinity) {
         throw new Error(LogErrors.IMPOSSIBLE_MATHEMATICAL_OPERATION);
     }
@@ -61,9 +62,14 @@ const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, curren
     }
 
     const args: Array<string> = argsFromBrackets[0].split(";");
+    const currentPosCell: string = `${currentCell.position[0]}${currentCell.position[1]}`;
+
+    if (args.includes(currentPosCell)) {
+        throw new Error(LogErrors.INVALID_FORMULA_ARGUMENT);
+    }
 
     if (args.some((arg) => arg === "")) {
-        return [];
+        throw new Error(LogErrors.NOT_FOUND_CELL_BY_POS);
     }
 
     return args.map((arg) => {

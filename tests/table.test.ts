@@ -8,7 +8,7 @@ describe("Тест класса Table", () => {
     test("создание экземпляра класса", () => {
         const table: ITableClass = new Table();
 
-        expect(table).toBeTruthy();
+        expect(table).toBeDefined();
     });
 
     test("проверка количества чисел (передано 123)", () => {

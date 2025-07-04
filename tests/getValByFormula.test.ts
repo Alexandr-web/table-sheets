@@ -57,4 +57,9 @@ describe("Тест utils функции getValByFormula", () => {
         const result = getValByFormula(`=${Formulas.INCREASE}(A1;AD1)`, mockTable, mockCurrentCell);
         expect(result).toBe(LogErrors.ERROR_NAME);
     });
+
+    it("следует обрабатывать ссылающиеся сами на себя ячейки", () => {
+        const result = getValByFormula(`=${Formulas.INCREASE}(A1;C1)`, mockTable, mockCurrentCell);
+        expect(result).toBe(LogErrors.ERROR_NAME);
+    });
 });

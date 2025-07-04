@@ -10,7 +10,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const localTableData: ITableData = JSON.parse(localStorage.getItem("table-data") || "{}");
     const localFormulasCells: Array<[string, string[]]> = JSON.parse(localStorage.getItem("formulas-cells") || "[]");
     const table: ITableClass = new Table().render(localFormulasCells, localTableData);
-    const input: IInputClass = new Input(table);
+    const input: IInputClass = new Input(table).init();
 
     new Cell(table, input).init();
 });

@@ -222,7 +222,7 @@ export default class Table implements ITableClass {
     }
 
     // добавление ячеек в таблицу
-    renderCells(): void {
+    renderCellsAndLetters(): void {
         const cells: Array<ICell> = this._getCells() as Array<ICell>;
         const letters: Array<string> = this._getLetters();
 
@@ -488,7 +488,7 @@ export default class Table implements ITableClass {
             });
         }
 
-        this.renderCells();
+        this.renderCellsAndLetters();
         this.renderNums();
 
         window.removeEventListener("resize", this._resizeHandler.bind(this));

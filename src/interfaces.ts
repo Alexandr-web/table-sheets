@@ -39,7 +39,7 @@ export interface ITableClass {
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
     saveLocalData(data?: ITableData): void;
     saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void;
-    renderCells(): void;
+    renderCellsAndLetters(): void;
     renderNums(): void;
     clearNums(): void;
     render(formulasCells?: Array<[string, string[]]>, data?: ITableData): ITableClass;
@@ -68,6 +68,7 @@ export interface IInputClass {
     _getValue(): string;
     _blurHandler(): void;
     setValue(cell: ICell): void;
+    init(): IInputClass;
 }
 
 export interface ICellStyles<T> {

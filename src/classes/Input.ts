@@ -10,8 +10,6 @@ export default class Input implements IInputClass {
         this.inputEl = document.querySelector(".wrapper__area-input") as HTMLInputElement;
         this.table = table;
         this.activeCell = null;
-
-        this.inputEl.addEventListener("blur", this._blurHandler.bind(this));
     }
 
     // изменение значения инпута содержанием (если имеется, то формулой) активной ячейки
@@ -73,5 +71,12 @@ export default class Input implements IInputClass {
         if (findCellInFormulas) {
             this.table.updateFormulaCells(findCellInFormulas, "updating");
         }
+    }
+
+    // инициализация работы инпута
+    init(): IInputClass {
+        this.inputEl.addEventListener("blur", this._blurHandler.bind(this));
+
+        return this;
     }
 }
