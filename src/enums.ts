@@ -45,8 +45,8 @@ export enum CellSizes {
 }
 
 export enum Formulas {
-    MULTIPLY = "УМНОЖИТЬ",
-    DIVIDE = "РАЗДЕЛИТЬ",
+    MULTIPLY = "УМНОЖ",
+    DIVIDE = "РАЗДЕЛ",
     INCREASE = "ПЛЮС",
     DECREASE = "МИНУС"
 }

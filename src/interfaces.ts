@@ -21,7 +21,7 @@ export interface ITableClass {
     _getLengthEnglishAlphabet(): number;
     _getLetters(): Array<string>;
     _getNums(): Array<number>;
-    _getCells(): Array<ICell>;
+    _getCells(getElements?: boolean): Array<ICell>|NodeListOf<HTMLLIElement>
     _resizeHandler(): void;
     _startResizeRow(e: MouseEvent, thin: HTMLSpanElement): void;
     _startResizeCol(e: MouseEvent, thin: HTMLSpanElement): void;
@@ -31,6 +31,9 @@ export interface ITableClass {
     _initEventsToResizeRow(): void;
     _initEventsToResizeColumn(): void;
     _initEventsToResizeCells(): void;
+    _editCellContent(cell: HTMLLIElement, val: string, index: number): void;
+    checkFormulaCellToLinked(pos: string, currentVal: string, prevVal: string): void;
+    updateFormulaCells(cell: Set<string>, updatingClassName: string): void;
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
     removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void;
     editCellData(idx: number, key: keyof ICell, value: unknown): void;
@@ -48,14 +51,23 @@ export interface ICellClass {
     activeClassName: string;
     updatingClassName: string;
     table: ITableClass;
+    input: IInputClass;
 
     _getElNums(): NodeListOf<HTMLLIElement>;
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
     _setContent(cell: HTMLLIElement): void;
-    updateFormulaCells(cell: Set<string>): void;
-    checkFormulaCellToLinked(pos: string): void;
     init(): void;
+}
+
+export interface IInputClass {
+    inputEl: HTMLInputElement;
+    table: ITableClass;
+    activeCell: ICell|null;
+
+    _getValue(): string;
+    _blurHandler(): void;
+    setValue(cell: ICell): void;
 }
 
 export interface ICellStyles<T> {
