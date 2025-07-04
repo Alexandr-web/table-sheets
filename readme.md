@@ -1,14 +1,21 @@
 A small clone of Excel written in TypeScript
 
-* Currently, you can use different functions, for example, =ПЛЮС(A1;МИНУС(2;A2))
+What is currently available
+
+* You can use different functions, for example, =ПЛЮС(A1;МИНУС(2;A2))
 * Change cell sizes
+* Saving data to the site's local storage
 
 Before running, make sure you have NodeJs and TypeScript installed
 
 To run the application, run the following commands:
 
+Installing packages
 ```cmd
-~ npm i
+npm i
+```
 
-~ npm run start
+Starting a local server
+```cmd
+npm run start
 ```
