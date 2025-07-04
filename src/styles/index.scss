@@ -35,7 +35,7 @@
             height: 100%;
             border-radius: mixins.scale(5);
             border: none;
-            padding: mixins.scale(10);
+            padding: mixins.scale(2);
             font-family: "Open Sans";
 
             &:focus {
@@ -58,6 +58,7 @@
         flex-grow: 1;
         overflow-y: auto;
         overflow-x: auto;
+        scrollbar-width: thin;
         position: relative;
 
         &-content {
