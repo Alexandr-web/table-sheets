@@ -48,15 +48,20 @@ export enum Formulas {
     MULTIPLY = "УМНОЖ",
     DIVIDE = "РАЗДЕЛ",
     INCREASE = "ПЛЮС",
-    DECREASE = "МИНУС"
+    DECREASE = "МИНУС",
+    SUM = "СУММ"
 }
 
 export enum LogErrors {
-    NOT_FOUND_CELL_BY_POS = "Ячеек с такой позицией не найдено",
+    INVALID_FORMULA_ARGUMENT = "Не подходящий аргумент функции",
     INVALID_FORMULA = "Неверная запись функции",
+    NOT_FOUND_FORMULA_ARGUMENTS = "Не найдено аргументов функции",
     NOT_FOUND_FORMULA = "Не найдено ни одной функции",
     IMPOSSIBLE_MATHEMATICAL_OPERATION = "Невозможная математическая операция",
-    NOT_FOUND_FORMULA_ARGUMENTS = "Не найдено аргументов функции",
-    INVALID_FORMULA_ARGUMENT = "Не подходящий аргумент функции",
+    INVALID_NUMBER_OF_RANGE_ARGUMENTS = "Недопустимое количество аргументов диапазона",
+    THE_RANGE_INCLUDES_VARIOUS_LETTERS = "В диапазоне участвуют разные буквы",
+    RANGE_ARGUMENTS_ARE_INCORRECTLY_PLACED = "Аргументы диапазона неверно расположены",
+    ALL_CELLS_IN_THE_RANGE_MUST_HAVE_A_NUMERIC_CONTENT_TYPE = "Все ячейки в диапазоне должны иметь числовой тип содержимого",
+    NOT_FOUND_CELL_BY_POS = "Ячеек с такой позицией не найдено",
     ERROR_NAME = "Ошибка/неверная запись"
 }
