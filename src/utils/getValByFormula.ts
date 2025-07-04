@@ -2,6 +2,8 @@ import { ICell, IFunctionName, ITableClass } from "@/interfaces";
 import { Formulas, LogErrors } from "@/enums";
 import { TCellPos } from "@/types";
 
+// список всех возможных функций
+const possibleFunctions: Array<string> = Object.values(Formulas).filter((key) => isNaN(Number(key)));
 // список названий функций, которые могут иметь 1 аргумент
 const formulasWithOneArg: Array<string> = [Formulas.SUM];
 // список названий функций, которые могут содержать диапазон ячеек
@@ -52,9 +54,6 @@ const sum = (args: Array<string|string[]>): string|never => {
     
     return nums.reduce<number>((total, num) => total += parseInt(num), 0).toString();
 }
-
-// список всех возможных функций
-const possibleFunctions: Array<string> = Object.values(Formulas).filter((key) => isNaN(Number(key)));
 
 // получение названий функций, участвующих в ячейке
 const getFunctionsNames = (str: string): Array<IFunctionName> => {
@@ -121,7 +120,7 @@ const getRangeValCells = (range: string, table: ITableClass, currentCell: ICell,
     const startNum: number = parseInt(firstNum);
     const endNum: number = parseInt(secondNum);
 
-    // начальная ячейка находится дальше конечной
+    // начальная ячейка должна наодиться раньше конечной
     if (startNum > endNum) {
         throw new Error(LogErrors.RANGE_ARGUMENTS_ARE_INCORRECTLY_PLACED);
     }
@@ -197,24 +196,22 @@ const getFunctionVal = (name: string, argsFunc: Array<string|string[]>): string 
     return "";
 }
 
-// замена функции на ее значение в общей строке
-const getNewStr = (funcName: IFunctionName, valFunc: string, str: string): string => {
-    return str.replace(funcName.fullName, valFunc);
-}
-
-// получение значения всей формулы/функции, применяемой в ячейке
+/**
+ * получение значения всей формулы/функции, применяемой в ячейке
+ * алгоритм действий:
+ * 1. находим самую "нижнюю" (последнюю) функцию
+ * 2. определяем ее аргументы
+ * 3. определяем ее значение
+ * 4. меняем, если требуется, ее на ее значение в общей строке
+ */
 const getValByFormula = (content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string => {
+    if (content[0] !== "=") {
+        return content;
+    }
+
+    const str: string = currentStr || content;
+
     try {
-        if (content[0] !== "=") {
-            return content;
-        }
-
-        // 1. находим самую "нижнюю" (последнюю) функцию
-        // 2. определяем ее аргументы
-        // 3. определяем ее значение
-        // 4. меняем, если требуется, ее на ее значение в общей строке
-
-        const str: string = currentStr || content;
         const functions: Array<IFunctionName> = getFunctionsNames(str);
 
         if (!functions.length) {
@@ -235,7 +232,8 @@ const getValByFormula = (content: string, table: ITableClass, currentCell: ICell
             return valFunc;
         }
 
-        const newStr: string = getNewStr(findLastFunc, valFunc, str);
+        // замена функции на ее значение
+        const newStr: string = str.replace(findLastFunc.fullName, valFunc);
 
         return getValByFormula(content, table, currentCell, newStr);
     } catch (err) {
