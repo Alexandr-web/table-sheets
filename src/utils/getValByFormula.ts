@@ -6,7 +6,15 @@ import { TCellPos } from "@/types";
 // минус
 const decrease = (args: Array<string>): string => (parseFloat(args[0]) - parseFloat(args[1])).toString();
 // разделить
-const divide = (args: Array<string>): string => (parseFloat(args[0]) / parseFloat(args[1])).toString();
+const divide = (args: Array<string>): string|never => {
+    const res: number = parseFloat(args[0]) / parseFloat(args[1]);
+
+    if (res === Infinity) {
+        throw new Error(LogErrors.IMPOSSIBLE_MATHEMATICAL_OPERATION);
+    }
+
+    return res.toString();
+};
 // плюс
 const increase = (args: Array<string>): string => (parseFloat(args[0]) + parseFloat(args[1])).toString();
 // умножить
@@ -26,15 +34,18 @@ const getFunctionsNames = (str: string): Array<IFunctionName> => {
             const name: string = findMatch[0];
             const startIdx: number = findMatch.index as number;
             
-            let fullName: string = name;
             let endIdx: number = startIdx + name.length - 1;
 
-            while (str[endIdx] !== ")") {
-                endIdx++;
-                fullName += str[endIdx];
-            }
+            const findEndBracket: RegExpMatchArray|null = str.slice(endIdx).match(/\)/);
 
-            functions.push({ idx: startIdx, endIdx, name, fullName, });
+            // если функция написана правильно, то добавляем ее в общий список
+            if (findEndBracket) {
+                endIdx = (findEndBracket.index as number) + endIdx;
+                
+                const fullName: string = str.slice(startIdx, endIdx + 1);
+
+                functions.push({ idx: startIdx, endIdx, name, fullName, });
+            }
         }
     });
 
@@ -42,14 +53,18 @@ const getFunctionsNames = (str: string): Array<IFunctionName> => {
 }
 
 // определение аргументов функции ячейки
-const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, currentCell: ICell, formula: string): Array<string> => {
+const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, currentCell: ICell, formula: string): Array<string>|never => {
     const argsFromBrackets: RegExpMatchArray|null = functionName.fullName.match(/(?<=\().*(?=\))/);
 
-    if (argsFromBrackets === null) {
-        return ["", ""];
+    if (argsFromBrackets === null || argsFromBrackets[0] === "") {
+        return [];
     }
 
     const args: Array<string> = argsFromBrackets[0].split(";");
+
+    if (args.some((arg) => arg === "")) {
+        return [];
+    }
 
     return args.map((arg) => {
         if (!/[A-Z]+\d+/.test(arg)) {
@@ -63,9 +78,7 @@ const getFunctionArgs = (functionName: IFunctionName, table: ITableClass, curren
         const findCell: ICell|undefined = table.data.cells.find(({ position }) => JSON.stringify(position) === JSON.stringify(findPos));
 
         if (!findCell) {
-            console.error(LogErrors.NOT_FOUND_CELL_BY_POS, findPos);
-
-            return arg;
+            throw new Error(LogErrors.NOT_FOUND_CELL_BY_POS);
         }
 
         // добавление найденных ячеек в общий список
@@ -112,9 +125,19 @@ const getValByFormula = (content: string, table: ITableClass, currentCell: ICell
 
         const str: string = currentStr || content;
         const functions: Array<IFunctionName> = getFunctionsNames(str);
+
+        if (!functions.length) {
+            throw new Error(LogErrors.NOT_FOUND_FORMULA);
+        }
+        
         const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
         const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
         const argsFunc: Array<string> = getFunctionArgs(findLastFunc, table, currentCell, content);
+
+        if (argsFunc.length < 2) {
+            throw new Error(LogErrors.NOT_FOUND_FORMULA_ARGUMENTS);
+        }
+
         const valFunc: string = getFunctionVal(findLastFunc.name, argsFunc);
 
         if (functions.length === 1) {
