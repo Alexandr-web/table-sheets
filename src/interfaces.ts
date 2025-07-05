@@ -71,6 +71,38 @@ export interface IInputClass {
     init(): IInputClass;
 }
 
+export interface IFormulaClass {
+    possibleFunctions: Array<string>;
+    formulasWithOneArg: Array<string>;
+    formulasWithRangeArg: Array<string>;
+
+    _getFunctionsNames(str: string): Array<IFunctionName>;
+    _getValCellByPos(pos: string, table: ITableClass, currentCell: ICell, formula: string): ICell|never;
+    _getRangeValCells(range: string, table: ITableClass, currentCell: ICell, formula: string): Array<string>|never;
+    _getFunctionArgs(functionName: IFunctionName, table: ITableClass, currentCell: ICell, formula: string): Array<string|string[]>|never;
+    _getFunctionVal(name: string, argsFunc: Array<string|string[]>): string;
+    decrease(args: Array<string|string[]>): string;
+    divide(args: Array<string|string[]>): string|never;
+    increase(args: Array<string|string[]>): string;
+    multiply(args: Array<string|string[]>): string;
+    sum(args: Array<string|string[]>): string;
+    abs(args: Array<string|string[]>): string;
+    acos(args: Array<string|string[]>): string;
+    acosh(args: Array<string|string[]>): string;
+    asin(args: Array<string|string[]>): string;
+    asinh(args: Array<string|string[]>): string;
+    atan(args: Array<string|string[]>): string;
+    atan2(args: Array<string|string[]>): string;
+    atanh(args: Array<string|string[]>): string;
+    averageVal(args: Array<string|string[]>): string;
+    ceiling(args: Array<string|string[]>): string;
+    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string;
+}
+
+export interface IUtilsClass {
+    pxToVw(px: number, base?: number): string;
+}
+
 export interface ICellStyles<T> {
     color: string;
     background: string;

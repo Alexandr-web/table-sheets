@@ -1,8 +1,11 @@
-import { ITableClass, ITableData, ICell, ICellStyles } from "@/interfaces";
+import { ITableClass, ITableData, ICell, ICellStyles, IFormulaClass, IUtilsClass } from "@/interfaces";
 import { EnglishAlphabet, Colors, CombinationsLetters, CellSizes } from "@/enums";
 import { TAccumulatorCells, TCellsLinkedToFormulas } from "@/types";
-import pxToVw from "@/utils/pxToVw";
-import getValByFormula from "@/utils/getValByFormula";
+import Utils from "@/classes/Utils";
+import Formula from "@/classes/Formula";
+
+const formulaInstance: IFormulaClass = new Formula();
+const utils: IUtilsClass = new Utils();
 
 export default class Table implements ITableClass {
     elListNums: HTMLUListElement;
@@ -187,7 +190,7 @@ export default class Table implements ITableClass {
 
             if (findIdxCell !== -1) {
                 const findCell: ICell = cells[findIdxCell];
-                const newVal: string = getValByFormula(formula, this, findCell);
+                const newVal: string = formulaInstance.getValueFromFormula(formula, this, findCell);
                 const findElCell: HTMLLIElement|undefined = Array.from(elCells).find((el) => el.dataset.pos === pos);
 
                 // обновление содержания ячейки, что содержит текущую в своей формуле/функции
@@ -247,8 +250,8 @@ export default class Table implements ITableClass {
             const styles: ICellStyles<string> = {
                 color: cell.color,
                 background: cell.background,
-                width: `${pxToVw(cell.width)}vw`,
-                height: `${pxToVw(cell.height)}vw`,
+                width: `${utils.pxToVw(cell.width)}vw`,
+                height: `${utils.pxToVw(cell.height)}vw`,
             };
             const inlineStyles: string = Object
                 .entries(styles)
@@ -276,7 +279,7 @@ export default class Table implements ITableClass {
             // HTML строка контента колонки
             const rowContentHTML: string = [cellLetterHTML(letters[idxList]), listHTML].join("\n");
             // HTML строка ряда с буквой и списком ячеек
-            const rowHTML = `<div class="wrapper__cells-row" style="width: ${pxToVw(widthRow)}vw">${rowContentHTML}</div>`;
+            const rowHTML = `<div class="wrapper__cells-row" style="width: ${utils.pxToVw(widthRow)}vw">${rowContentHTML}</div>`;
 
             this.elWrapCells.innerHTML += rowHTML;
         });
@@ -288,12 +291,12 @@ export default class Table implements ITableClass {
         const firstCell: HTMLLIElement = firstRow.querySelector(".wrapper__cells-list-item") as HTMLLIElement;
         const top: number = firstCell.offsetTop;
 
-        this.elListNums.style.marginTop = `${pxToVw(top)}vw`;
+        this.elListNums.style.marginTop = `${utils.pxToVw(top)}vw`;
 
         this._getNums().forEach((num) => {
             const cellByNum: HTMLLIElement = document.querySelector(`.wrapper__cells-list-item[data-num="${num}"]`) as HTMLLIElement;
             const height: number = cellByNum.offsetHeight;
-            const numHTML: string = `<li class="wrapper__nums-list-item" style="height: ${pxToVw(height)}vw" data-val="${num}">
+            const numHTML: string = `<li class="wrapper__nums-list-item" style="height: ${utils.pxToVw(height)}vw" data-val="${num}">
                 <span>${num}</span>
                 <span class="wrapper__nums-list-item-thin"></span>
             </li>`;
@@ -348,7 +351,7 @@ export default class Table implements ITableClass {
 
         const currentX: number = e.pageX;
         const width: number = currentX - this._startX + this._currentRowWidth;
-        const widthStr: string = `${pxToVw(width)}vw`;
+        const widthStr: string = `${utils.pxToVw(width)}vw`;
 
         if (width >= CellSizes.MIN_WIDTH) {
             this._currentRow.style.width = widthStr;
@@ -371,7 +374,7 @@ export default class Table implements ITableClass {
 
         const currentY: number = e.pageY;
         const height: number = currentY - this._startY + this._currentColHeight;
-        const heightStr: string = `${pxToVw(height)}vw`;
+        const heightStr: string = `${utils.pxToVw(height)}vw`;
         
         if (height >= CellSizes.MIN_HEIGHT) {
             this._currentCol.style.height = heightStr;
