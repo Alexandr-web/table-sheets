@@ -298,6 +298,7 @@ export default class Formula implements IFormulaClass {
         return "";
     }
 
+    // получение значения всей формулы/функции, применяемой в ячейке
     getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string {
         if (content[0] !== "=") {
             return content;
@@ -306,12 +307,14 @@ export default class Formula implements IFormulaClass {
         const str: string = currentStr || content;
 
         try {
+            // находим самую "нижнюю" (последнюю) функцию
             const functions: Array<IFunctionName> = this._getFunctionsNames(str);
 
             if (!functions.length) {
                 throw new Error(LogErrors.NOT_FOUND_FORMULA);
             }
-            
+
+            // определяем ее аргументы
             const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
             const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
             const argsFunc: Array<string|string[]> = this._getFunctionArgs(findLastFunc, table, currentCell, content);
@@ -320,13 +323,14 @@ export default class Formula implements IFormulaClass {
                 throw new Error(LogErrors.NOT_FOUND_FORMULA_ARGUMENTS);
             }
 
+            // определяем ее значение
             const valFunc: string = this._getFunctionVal(findLastFunc.name, argsFunc);
 
             if (functions.length === 1) {
                 return valFunc;
             }
 
-            // замена функции на ее значение
+            // меняем, если требуется, ее на ее значение в общей строке
             const newStr: string = str.replace(findLastFunc.fullName, valFunc);
 
             return this.getValueFromFormula(content, table, currentCell, newStr);
