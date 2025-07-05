@@ -49,7 +49,17 @@ export enum Formulas {
     DIVIDE = "РАЗДЕЛ",
     INCREASE = "ПЛЮС",
     DECREASE = "МИНУС",
-    SUM = "СУММ"
+    SUM = "СУММ",
+    ABS = "ABS",
+    ACOS = "ACOS",
+    ACOSH = "ACOSH",
+    ASIN = "ASIN",
+    ASINH = "ASINH",
+    ATAN = "ATAN",
+    ATAN2 = "ATAN2",
+    ATANH = "ATANH",
+    AVERAGE_VALUE = "СРЗНАЧ",
+    CEILING = "CEILING"
 }
 
 export enum LogErrors {

@@ -5,9 +5,9 @@ import { TCellPos } from "@/types";
 // список всех возможных функций
 const possibleFunctions: Array<string> = Object.values(Formulas).filter((key) => isNaN(Number(key)));
 // список названий функций, которые могут иметь 1 аргумент
-const formulasWithOneArg: Array<string> = [Formulas.SUM];
+const formulasWithOneArg: Array<string> = [Formulas.SUM, Formulas.ABS, Formulas.ACOS, Formulas.ACOSH, Formulas.ASIN, Formulas.ASINH, Formulas.ATAN, Formulas.ATANH, Formulas.AVERAGE_VALUE, Formulas.CEILING];
 // список названий функций, которые могут содержать диапазон ячеек
-const formulasWithRangeArg: Array<string> = [Formulas.SUM];
+const formulasWithRangeArg: Array<string> = [Formulas.SUM, Formulas.AVERAGE_VALUE];
 
 // математические функции
 // минус
@@ -45,14 +45,71 @@ const multiply = (args: Array<string|string[]>): string => {
     return res;
 }
 // сумма значений ячеек в заданном диапазоне
-const sum = (args: Array<string|string[]>): string|never => {
+const sum = (args: Array<string|string[]>): string => {
     const [nums] = args as Array<string[]>;
-
-    if (!nums.every((n) => parseInt(n))) {
-        throw new Error(LogErrors.ALL_CELLS_IN_THE_RANGE_MUST_HAVE_A_NUMERIC_CONTENT_TYPE);
-    }
     
     return nums.reduce<number>((total, num) => total += parseInt(num), 0).toString();
+}
+// абсолютное значение
+const abs = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.abs(parseInt(num)).toString();
+}
+// возвращает арккосинус числа
+const acos = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.acos(parseInt(num)).toString();
+}
+// возвращает гиперболический арккосинус числа
+const acosh = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.acosh(parseInt(num)).toString();
+}
+// возвращает арксинус числа
+const asin = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.asin(parseInt(num)).toString();
+}
+// возвращает гиперболический арксинус числа
+const asinh = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.asinh(parseInt(num)).toString();
+}
+// возвращает арктангенс числа
+const atan = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+    
+    return Math.atan(parseInt(num)).toString();
+}
+// возвращает арктангенс для заданных координат x и y
+const atan2 = (args: Array<string|string[]>): string => {
+    const [arg1, arg2] = args as Array<string>;
+
+    return Math.atan2(parseInt(arg1), parseInt(arg2)).toString();
+}
+// возвращает гиперболический арктангенс числа
+const atanh = (args: Array<string|string[]>): string => {
+    const [arg] = args as Array<string>;
+
+    return Math.atanh(parseInt(arg)).toString();
+}
+// возвращает среднее значение из заданного диапазона
+const averageVal = (args: Array<string|string[]>): string => {
+    const [nums] = args as Array<string[]>;
+    const sumNums: number = parseInt(sum(args));
+
+    return (sumNums / nums.length).toString();
+}
+// округляет число до ближайшего целого или кратного
+const ceiling = (args: Array<string|string[]>): string => {
+    const [num] = args as Array<string>;
+
+    return Math.ceil(parseInt(num)).toString();
 }
 
 // получение названий функций, участвующих в ячейке
@@ -65,7 +122,12 @@ const getFunctionsNames = (str: string): Array<IFunctionName> => {
         if (findMatch !== null) {
             const name: string = findMatch[0];
             const startIdx: number = findMatch.index as number;
-            
+
+            // проверка на случай совпадающих названий, например, ATAN и ATAN2
+            if (functions.some(({ idx }) => idx === startIdx)) {
+                return;
+            }
+
             let endIdx: number = startIdx + name.length - 1;
 
             const findEndBracket: RegExpMatchArray|null = str.slice(endIdx).match(/\)/);
@@ -190,6 +252,26 @@ const getFunctionVal = (name: string, argsFunc: Array<string|string[]>): string 
                 return decrease(argsFunc);
             case Formulas.SUM:
                 return sum(argsFunc);
+            case Formulas.ABS:
+                return abs(argsFunc);
+            case Formulas.ACOS:
+                return acos(argsFunc);
+            case Formulas.ACOSH:
+                return acosh(argsFunc);
+            case Formulas.ASIN:
+                return asin(argsFunc);
+            case Formulas.ASINH:
+                return asinh(argsFunc);
+            case Formulas.ATAN:
+                return atan(argsFunc);
+            case Formulas.ATAN2:
+                return atan2(argsFunc);
+            case Formulas.ATANH:
+                return atanh(argsFunc);
+            case Formulas.AVERAGE_VALUE:
+                return averageVal(argsFunc);
+            case Formulas.CEILING:
+                return ceiling(argsFunc);
         }
     }
 
