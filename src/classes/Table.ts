@@ -14,13 +14,13 @@ export default class Table implements ITableClass {
     cellsLinkedToFormulas: TCellsLinkedToFormulas;
     _countNums: number;
     _startX: number|null;
-    _currentRowWidth: number|null;
-    _currentRow: HTMLDivElement|null;
-    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
-    _startY: number|null;
-    _currentColHeight: number|null;
-    _currentCol: HTMLSpanElement|null;
+    _currentColWidth: number|null;
+    _currentCol: HTMLDivElement|null;
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
+    _startY: number|null;
+    _currentRowHeight: number|null;
+    _currentRow: HTMLSpanElement|null;
+    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
 
     constructor(countNums: number = CombinationsLetters.MIN) {
         // список, содержащий ячейки, привязанные друг к другу с помощью формул/функций
@@ -36,15 +36,15 @@ export default class Table implements ITableClass {
 
         // данные для ширины ряда
         this._startX = null;
-        this._currentRow = null;
-        this._currentRowWidth = null;
-        this._currentRowElCells = null;
+        this._currentCol = null;
+        this._currentColWidth = null;
+        this._currentColElCells = null;
 
         // данные для высоты колонки
         this._startY = null;
-        this._currentCol = null;
-        this._currentColHeight = null;
-        this._currentColElCells = null;
+        this._currentRow = null;
+        this._currentRowHeight = null;
+        this._currentRowElCells = null;
 
         if (countNums < CombinationsLetters.MIN) {
             this._countNums = CombinationsLetters.MIN;
@@ -325,10 +325,10 @@ export default class Table implements ITableClass {
         const letter: string = parentLetter.dataset.val as string;
         const cells: NodeListOf<HTMLLIElement> = document.querySelectorAll(`.wrapper__cells-list-item[data-letter="${letter}"]`) as NodeListOf<HTMLLIElement>;
 
-        this._currentRowWidth = parentRow.offsetWidth;
-        this._currentRow = parentRow;
+        this._currentColWidth = parentRow.offsetWidth;
+        this._currentCol = parentRow;
         this._startX = e.pageX;
-        this._currentRowElCells = cells;
+        this._currentColElCells = cells;
     }
 
     // фиксирование данных изменяемой высоту колонки
@@ -337,26 +337,26 @@ export default class Table implements ITableClass {
         const num: string = parentCol.dataset.val as string;
         const cells: NodeListOf<HTMLLIElement> = document.querySelectorAll(`.wrapper__cells-list-item[data-num="${num}"]`) as NodeListOf<HTMLLIElement>;
 
-        this._currentColHeight = parentCol.offsetHeight;
-        this._currentCol = parentCol;
+        this._currentRowHeight = parentCol.offsetHeight;
+        this._currentRow = parentCol;
         this._startY = e.pageY;
-        this._currentColElCells = cells;
+        this._currentRowElCells = cells;
     }
 
     // изменение ширины ряда
     _mouseResizeRow(e: MouseEvent): void {
-        if (this._startX === null || this._currentRowWidth === null || this._currentRow === null || this._currentRowElCells === null) {
+        if (this._startX === null || this._currentColWidth === null || this._currentCol === null || this._currentColElCells === null) {
             return;
         }
 
         const currentX: number = e.pageX;
-        const width: number = currentX - this._startX + this._currentRowWidth;
+        const width: number = currentX - this._startX + this._currentColWidth;
         const widthStr: string = `${utils.pxToVw(width)}vw`;
 
         if (width >= CellSizes.MIN_WIDTH) {
-            this._currentRow.style.width = widthStr;
+            this._currentCol.style.width = widthStr;
 
-            this._currentRowElCells.forEach((cell) => {
+            this._currentColElCells.forEach((cell) => {
                 const idx: number = parseInt(cell.dataset.index as string);
 
                 cell.style.width = widthStr;
@@ -368,18 +368,18 @@ export default class Table implements ITableClass {
 
     // изменение высоты колонки ячеек
     _mouseResizeColumn(e: MouseEvent): void {
-        if (this._startY === null || this._currentColHeight === null || this._currentCol === null || this._currentColElCells === null) {
+        if (this._startY === null || this._currentRowHeight === null || this._currentRow === null || this._currentRowElCells === null) {
             return;
         }
 
         const currentY: number = e.pageY;
-        const height: number = currentY - this._startY + this._currentColHeight;
+        const height: number = currentY - this._startY + this._currentRowHeight;
         const heightStr: string = `${utils.pxToVw(height)}vw`;
         
         if (height >= CellSizes.MIN_HEIGHT) {
-            this._currentCol.style.height = heightStr;
+            this._currentRow.style.height = heightStr;
 
-            this._currentColElCells.forEach((cell) => {
+            this._currentRowElCells.forEach((cell) => {
                 const idx: number = parseInt(cell.dataset.index as string);
 
                 cell.style.height = heightStr;
@@ -391,15 +391,15 @@ export default class Table implements ITableClass {
 
     // очистка данных для изменения ячеек
     _stopResizeCells(): void {
-        this._currentRowWidth = null;
-        this._currentRow = null;
+        this._currentColWidth = null;
+        this._currentCol = null;
         this._startX = null;
-        this._currentRowElCells = null;
+        this._currentColElCells = null;
 
         this._startY = null;
-        this._currentColHeight = null;
-        this._currentCol = null;
-        this._currentColElCells = null;
+        this._currentRowHeight = null;
+        this._currentRow = null;
+        this._currentRowElCells = null;
 
         this.saveLocalData();
     }

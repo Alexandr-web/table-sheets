@@ -7,13 +7,13 @@ export interface ITableClass {
     cellsLinkedToFormulas: Map<string, Set<string>>;
     _countNums: number;
     _startX: number|null;
-    _currentRowWidth: number|null;
-    _currentRow: HTMLDivElement|null;
-    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
-    _startY: number|null;
-    _currentColHeight: number|null;
-    _currentCol: HTMLSpanElement|null;
+    _currentColWidth: number|null;
+    _currentCol: HTMLDivElement|null;
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
+    _startY: number|null;
+    _currentRowHeight: number|null;
+    _currentRow: HTMLSpanElement|null;
+    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
 
     _fillNums(): Array<number>;
     _fillCells(): Array<ICell>;

@@ -59,7 +59,7 @@ export enum Formulas {
     ATAN2 = "ATAN2",
     ATANH = "ATANH",
     AVERAGE_VALUE = "СРЗНАЧ",
-    CEILING = "CEILING"
+    CEILING = "CEILING",
 }
 
 export enum LogErrors {
