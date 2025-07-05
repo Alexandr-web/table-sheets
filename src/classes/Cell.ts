@@ -1,6 +1,7 @@
-import { ICellClass, ITableClass, ICell, IInputClass } from "@/interfaces";
+import { ICellClass, ITableClass, ICell, IInputClass, IFormulaClass } from "@/interfaces";
+import Formula from "@/classes/Formula";
 
-import getValByFormula from "@/utils/getValByFormula";
+const formula: IFormulaClass = new Formula();
 
 export default class Cell implements ICellClass {
     elCells: NodeListOf<HTMLLIElement>;
@@ -64,7 +65,7 @@ export default class Cell implements ICellClass {
         // проверка на существование этой ячейки в связанном списке ячеек, что участвуют в формулах/функциях
         this.table.checkFormulaCellToLinked(pos, cell.innerText, prevVal);
 
-        const currentVal: string = getValByFormula(cell.innerText, this.table, currentCell);
+        const currentVal: string = formula.getValueFromFormula(cell.innerText, this.table, currentCell);
         const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
         if (prevVal !== currentVal) {

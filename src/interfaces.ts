@@ -7,13 +7,13 @@ export interface ITableClass {
     cellsLinkedToFormulas: Map<string, Set<string>>;
     _countNums: number;
     _startX: number|null;
-    _currentRowWidth: number|null;
-    _currentRow: HTMLDivElement|null;
-    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
-    _startY: number|null;
-    _currentColHeight: number|null;
-    _currentCol: HTMLSpanElement|null;
+    _currentColWidth: number|null;
+    _currentCol: HTMLDivElement|null;
     _currentColElCells: NodeListOf<HTMLLIElement>|null;
+    _startY: number|null;
+    _currentRowHeight: number|null;
+    _currentRow: HTMLSpanElement|null;
+    _currentRowElCells: NodeListOf<HTMLLIElement>|null;
 
     _fillNums(): Array<number>;
     _fillCells(): Array<ICell>;
@@ -69,6 +69,38 @@ export interface IInputClass {
     _blurHandler(): void;
     setValue(cell: ICell): void;
     init(): IInputClass;
+}
+
+export interface IFormulaClass {
+    possibleFunctions: Array<string>;
+    formulasWithOneArg: Array<string>;
+    formulasWithRangeArg: Array<string>;
+
+    _getFunctionsNames(str: string): Array<IFunctionName>;
+    _getValCellByPos(pos: string, table: ITableClass, currentCell: ICell, formula: string): ICell|never;
+    _getRangeValCells(range: string, table: ITableClass, currentCell: ICell, formula: string): Array<string>|never;
+    _getFunctionArgs(functionName: IFunctionName, table: ITableClass, currentCell: ICell, formula: string): Array<string|string[]>|never;
+    _getFunctionVal(name: string, argsFunc: Array<string|string[]>): string;
+    decrease(args: Array<string|string[]>): string;
+    divide(args: Array<string|string[]>): string|never;
+    increase(args: Array<string|string[]>): string;
+    multiply(args: Array<string|string[]>): string;
+    sum(args: Array<string|string[]>): string;
+    abs(args: Array<string|string[]>): string;
+    acos(args: Array<string|string[]>): string;
+    acosh(args: Array<string|string[]>): string;
+    asin(args: Array<string|string[]>): string;
+    asinh(args: Array<string|string[]>): string;
+    atan(args: Array<string|string[]>): string;
+    atan2(args: Array<string|string[]>): string;
+    atanh(args: Array<string|string[]>): string;
+    averageVal(args: Array<string|string[]>): string;
+    ceiling(args: Array<string|string[]>): string;
+    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string;
+}
+
+export interface IUtilsClass {
+    pxToVw(px: number, base?: number): string;
 }
 
 export interface ICellStyles<T> {

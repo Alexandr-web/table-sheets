@@ -1,5 +1,7 @@
-import { ICell, IInputClass, ITableClass } from "@/interfaces";
-import getValByFormula from "@/utils/getValByFormula";
+import { ICell, IFormulaClass, IInputClass, ITableClass } from "@/interfaces";
+import Formula from "@/classes/Formula";
+
+const formula: IFormulaClass = new Formula();
 
 export default class Input implements IInputClass {
     inputEl: HTMLInputElement;
@@ -62,7 +64,7 @@ export default class Input implements IInputClass {
         // проверка на существование текущей ячейки в связанном списке ячеек, что участвуют в формулах/функциях
         this.table.checkFormulaCellToLinked(pos, inputVal, this.activeCell.content);
 
-        const newVal: string = getValByFormula(inputVal, this.table, this.activeCell);
+        const newVal: string = formula.getValueFromFormula(inputVal, this.table, this.activeCell);
         const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
         // изменение содержимого ячейки
