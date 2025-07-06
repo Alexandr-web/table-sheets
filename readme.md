@@ -8,6 +8,7 @@ The project used TypeScript, Jest, Webpack, Commitizen, Scss
 What is currently available
 
 * You can use different functions, for example, =ABS(A1). It is also possible to specify a range (A1:A5) and handle nested functions (=ABS(СУММ(A1:A5)))
+* Copy, paste, change cell color and background using context menu
 * Change cell sizes
 * Saving data to the site's local storage
 

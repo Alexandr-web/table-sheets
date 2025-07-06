@@ -227,6 +227,74 @@
     }
 }
 
+.context-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+    display: none;
+    
+    &__list {
+        background-color: vars.$white;
+        border: mixins.scale(1) solid vars.$light-blue-1;
+        display: flex;
+        flex-direction: column;
+        min-width: mixins.scale(100);
+
+        &.colors {
+            min-width: mixins.scale(60);
+        }
+
+        &.sublist {
+            position: absolute;
+            right: 0;
+            top: 0;
+            transform: translateX(100%);
+            display: none;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            max-height: mixins.scale(100);
+        }
+    }
+
+    &__item {
+        position: relative;
+
+        &:hover > ul {
+            display: flex;
+        }
+
+        &-color {
+            min-width: mixins.scale(30);
+            min-height: mixins.scale(10);
+            border: mixins.scale(1) solid vars.$dark-gray-1;
+        }
+
+        &-text {
+            padding: mixins.scale(5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: mixins.scale(8);
+
+            &:hover {
+                background-color: vars.$light-blue-1;
+                cursor: pointer;
+            }
+        }
+
+        &-icon {
+            display: none;
+            max-width: mixins.scale(6);
+            margin-left: mixins.scale(5);
+        }
+
+        &.checked &-icon {
+            display: block;
+        }
+    }
+}
+
 .logo-title {
     font-size: mixins.scale(14);
     font-weight: 400;

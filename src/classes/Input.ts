@@ -1,6 +1,8 @@
-import { ICell, IFormulaClass, IInputClass, ITableClass } from "@/interfaces";
+import { ICell, IFormulaClass, IInputClass, ITableClass, IUtilsClass } from "@/interfaces";
 import Formula from "@/classes/Formula";
+import Utils from "@/classes/Utils";
 
+const utils: IUtilsClass = new Utils();
 const formula: IFormulaClass = new Formula();
 
 export default class Input implements IInputClass {
@@ -17,30 +19,9 @@ export default class Input implements IInputClass {
     // изменение значения инпута содержанием (если имеется, то формулой) активной ячейки
     setValue(cell: ICell): void {
         const pos: string = JSON.stringify(cell.position);
-        const cellsArr: Array<[string, Set<string>]> = Array.from(this.table.cellsLinkedToFormulas);
+        const findFormula: string|undefined = utils.getFormulaCellByPos(pos, this.table);
 
-        let findActiveCell: string|null = null;
-
-        for (let i = 0; i < cellsArr.length; i++) {
-            const [_, setArr] = cellsArr[i];
-            const cellsFormulasPos: Array<string> = Array.from(setArr);
-            const findIdxActiveCell: number = cellsFormulasPos.findIndex((str) => str.split("|")[0] === pos);
-
-            if (findIdxActiveCell !== -1) {
-                findActiveCell = cellsFormulasPos[findIdxActiveCell];
-
-                break;
-            }
-        }
-
-        if (findActiveCell) {
-            const formula: string = findActiveCell.split("|")[1];
-
-            this.inputEl.value = formula;
-        } else {
-            this.inputEl.value = cell.content;
-        }
-
+        this.inputEl.value = findFormula ? findFormula : cell.content;
         this.activeCell = cell;
     }
 
@@ -68,7 +49,7 @@ export default class Input implements IInputClass {
         const findCellInFormulas: Set<string>|undefined = this.table.cellsLinkedToFormulas.get(pos);
 
         // изменение содержимого ячейки
-        this.table._editCellContent(elCell, newVal, index);
+        this.table.editCellContent(elCell, newVal, index);
 
         if (findCellInFormulas) {
             this.table.updateFormulaCells(findCellInFormulas, "updating");
