@@ -52,11 +52,13 @@ export interface ICellClass {
     updatingClassName: string;
     table: ITableClass;
     input: IInputClass;
+    contextMenu: IContextMenuClass;
 
     _getElNums(): NodeListOf<HTMLLIElement>;
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
     _setContent(cell: HTMLLIElement): void;
+    _setContextMenu(e: MouseEvent): void;
     init(): void;
 }
 
@@ -99,6 +101,17 @@ export interface IFormulaClass {
     getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string;
 }
 
+export interface IContextMenuClass {
+    elMenu: HTMLDivElement;
+    data: Array<IContextMenuData>;
+
+    _renderItems(list?: Array<IContextMenuData>): string;
+    _hideByScreenClick(e: MouseEvent): void;
+    show(x: number, y: number): void;
+    hide(): void;
+    init(): IContextMenuClass;
+}
+
 export interface IUtilsClass {
     pxToVw(px: number, base?: number): string;
 }
@@ -108,6 +121,12 @@ export interface ICellStyles<T> {
     background: string;
     width: T;
     height: T;
+}
+
+export interface IContextMenuData {
+    text: string;
+    id: string;
+    sublist?: Array<IContextMenuData>;
 }
 
 export interface ICell extends ICellStyles<number> {

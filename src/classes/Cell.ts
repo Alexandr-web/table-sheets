@@ -1,4 +1,4 @@
-import { ICellClass, ITableClass, ICell, IInputClass, IFormulaClass } from "@/interfaces";
+import { ICellClass, ITableClass, ICell, IInputClass, IFormulaClass, IContextMenuClass } from "@/interfaces";
 import Formula from "@/classes/Formula";
 
 const formula: IFormulaClass = new Formula();
@@ -10,14 +10,16 @@ export default class Cell implements ICellClass {
     updatingClassName: string;
     table: ITableClass;
     input: IInputClass;
+    contextMenu: IContextMenuClass;
 
-    constructor(table: ITableClass, input: IInputClass) {
+    constructor(table: ITableClass, input: IInputClass, contextMenu: IContextMenuClass) {
         this.elCells = document.querySelectorAll(".wrapper__cells-list-item") as NodeListOf<HTMLLIElement>;
         this.elLetters = document.querySelectorAll(".wrapper__cells-letter") as NodeListOf<HTMLDivElement>;
         this.activeClassName = "active";
         this.updatingClassName = "updating";
         this.table = table;
         this.input = input;
+        this.contextMenu = contextMenu;
     }
 
     // получение элементов чисел (получаем через метод, так как они могут обновляться после изменения размеров экрана)
@@ -78,11 +80,18 @@ export default class Cell implements ICellClass {
         }
     }
 
+    _setContextMenu(e: MouseEvent): void {
+        e.preventDefault();
+
+        this.contextMenu.show(e.pageX, e.pageY);
+    }
+
     // инициализация работы ячеек
     init(): void {
         this.elCells.forEach((cell) => {
             cell.addEventListener("focus", this._setActive.bind(this, cell));
             cell.addEventListener("blur", this._setContent.bind(this, cell));
+            cell.addEventListener("contextmenu", this._setContextMenu.bind(this));
             cell.addEventListener("animationend", () => cell.classList.remove(this.updatingClassName));
         });
     }

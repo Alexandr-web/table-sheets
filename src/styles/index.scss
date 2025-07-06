@@ -227,6 +227,50 @@
     }
 }
 
+.context-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+    display: none;
+    
+    &__list {
+        background-color: vars.$white;
+        border: mixins.scale(1) solid vars.$light-blue-1;
+        display: flex;
+        flex-direction: column;
+        min-width: mixins.scale(100);
+
+        &.sublist {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: translateX(100%);
+            display: none;
+        }
+    }
+
+    &__item {
+        position: relative;
+
+        &:hover > ul {
+            display: flex;
+        }
+
+        span {
+            padding: mixins.scale(5);
+            display: block;
+            color: vars.$dark-gray-2;
+            font-size: mixins.scale(8);
+
+            &:hover {
+                background-color: vars.$light-blue-1;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
 .logo-title {
     font-size: mixins.scale(14);
     font-weight: 400;
