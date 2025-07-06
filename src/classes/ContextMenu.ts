@@ -26,18 +26,27 @@ export default class ContextMenu implements IContextMenuClass {
     _renderItems(list?: Array<IContextMenuData>): string {
         const items: Array<string> = [];
         const data: Array<IContextMenuData> = list ? list : this.data;
+        const isColors: boolean = data.every(({ id }) => id.includes("-") && ["color", "background"].includes(id.split("-")[0]));
+        const additionalListClasses: Array<string> = [
+            { name: "sublist", condition: Boolean(list), },
+            { name: "colors", condition: Boolean(isColors) }
+        ].filter(({ condition }) => condition).map(({ name }) => name);
 
-        data.forEach(({ text, id, sublist, option }) => {
+        // добавление элементов (HTML строк) в массив
+        data.forEach(({ text = "", id, sublist, option }) => {
             const sublistStr: string = sublist ? this._renderItems(sublist) : "";
             const iconCheck: string = `<img class="context-menu__item-icon" src="${require("../assets/icons/check.svg")}" />`;
-            const textEl: string = `<div class="context-menu__item-text">${text}${option ? iconCheck : ""}</div>`
+            const colorBox: string = 
+                isColors ? `<div class="context-menu__item-color" style="background-color: ${id.split("-")[1]}"></div>` : "";
+
+            const textEl: string = `<div class="context-menu__item-text">${text}${colorBox}${option ? iconCheck : ""}</div>`
             const item: string = 
                 `<li class="context-menu__item ${sublistStr ? "sublist-parent" : ""}" data-id="${id}">${textEl}${sublistStr}</li>`;
 
             items.push(item);
         });
 
-        return `<ul class="context-menu__list ${list ? "sublist" : ""}">${items.join("\n")}</ul>`;
+        return `<ul class="context-menu__list ${additionalListClasses.join(" ")}">${items.join("\n")}</ul>`;
     }
 
     // скрытие контекстного меню при клике по экрану

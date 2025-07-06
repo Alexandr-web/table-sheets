@@ -241,9 +241,13 @@
         flex-direction: column;
         min-width: mixins.scale(100);
 
+        &.colors {
+            min-width: mixins.scale(60);
+        }
+
         &.sublist {
             position: absolute;
-            left: 0;
+            right: 0;
             top: 0;
             transform: translateX(100%);
             display: none;
@@ -258,6 +262,12 @@
 
         &:hover > ul {
             display: flex;
+        }
+
+        &-color {
+            min-width: mixins.scale(30);
+            min-height: mixins.scale(10);
+            border: mixins.scale(1) solid vars.$dark-gray-1;
         }
 
         &-text {
@@ -275,7 +285,8 @@
 
         &-icon {
             display: none;
-            max-width: mixins.scale(8);
+            max-width: mixins.scale(6);
+            margin-left: mixins.scale(5);
         }
 
         &.checked &-icon {

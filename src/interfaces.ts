@@ -135,7 +135,7 @@ export interface ICellStyles<T> {
 }
 
 export interface IContextMenuData {
-    text: string;
+    text?: string;
     id: string;
     option?: boolean;
     sublist?: Array<IContextMenuData>;

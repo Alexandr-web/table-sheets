@@ -17,7 +17,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const colorsSublist = (id: string): Array<IContextMenuData> => Object
         .entries(Colors)
         .map(([_, val]) => ({
-            text: val,
             id: `${id}-${val}`,
             option: true
         }));
