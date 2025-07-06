@@ -13,27 +13,29 @@ window.addEventListener("DOMContentLoaded", () => {
     const localFormulasCells: Array<[string, string[]]> = JSON.parse(localStorage.getItem("formulas-cells") || "[]");
     const table: ITableClass = new Table().render(localFormulasCells, localTableData);
     const input: IInputClass = new Input(table).init();
+
+    const colorsSublist = (id: string): Array<IContextMenuData> => Object
+        .entries(Colors)
+        .map(([_, val]) => ({
+            text: val,
+            id: `${id}-${val}`
+        }));
+
     const contextMenuData: Array<IContextMenuData> = [
         { text: "Скопировать", id: "copy" },
         { text: "Вставить", id: "paste" },
         {
             text: "Цвет",
             id: "color",
-            sublist: [
-                { text: "Белый", id: `color-${Colors.WHITE}` },
-                { text: "Черный", id: `color-${Colors.BLACK}` },
-            ]
+            sublist: colorsSublist("color")
         },
         {
             text: "Задний фон",
             id: "background",
-            sublist: [
-                { text: "Белый", id: `background-${Colors.WHITE}` },
-                { text: "Черный", id: `background-${Colors.BLACK}` },
-            ]
+            sublist: colorsSublist("background")
         }
     ];
-    const contextMenu: IContextMenuClass = new ContextMenu(contextMenuData).init();
+    const contextMenu: IContextMenuClass = new ContextMenu(contextMenuData, table).init();
 
     new Cell(table, input, contextMenu).init();
 });

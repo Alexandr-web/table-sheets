@@ -31,12 +31,13 @@ export interface ITableClass {
     _initEventsToResizeRow(): void;
     _initEventsToResizeColumn(): void;
     _initEventsToResizeCells(): void;
-    _editCellContent(cell: HTMLLIElement, val: string, index: number): void;
+    _getCellStyles(cell: ICell): string;
+    editCellContent(cell: HTMLLIElement, val: string, index: number): void;
     checkFormulaCellToLinked(pos: string, currentVal: string, prevVal: string): void;
     updateFormulaCells(cell: Set<string>, updatingClassName: string): void;
     addCellToFormulasList(posLinkedCell: string, posFormulaCell: string, formula: string): void;
     removeCellFromFormulasList(posLinkedCell: string, valFormulaCell: string): void;
-    editCellData(idx: number, key: keyof ICell, value: unknown): void;
+    editCellData(idx: number, key: keyof ICell, value: unknown, updateStyles?: boolean): void;
     saveLocalData(data?: ITableData): void;
     saveCellsLinkedToFormulas(data?: Map<string, Set<string>>): void;
     renderCellsAndLetters(): void;
@@ -58,7 +59,7 @@ export interface ICellClass {
     _clearActive(): void;
     _setActive(cell: HTMLLIElement): void;
     _setContent(cell: HTMLLIElement): void;
-    _setContextMenu(e: MouseEvent): void;
+    _setContextMenu(e: MouseEvent, cell: HTMLLIElement): void;
     init(): void;
 }
 
@@ -104,16 +105,24 @@ export interface IFormulaClass {
 export interface IContextMenuClass {
     elMenu: HTMLDivElement;
     data: Array<IContextMenuData>;
+    activeCell: ICell|null;
+    copyContent: string|null;
+    table: ITableClass;
 
     _renderItems(list?: Array<IContextMenuData>): string;
     _hideByScreenClick(e: MouseEvent): void;
-    show(x: number, y: number): void;
+    copyCellContent(): void;
+    pasteCellContent(): void;
+    setCellColor(color: string): void;
+    setCellBackground(color: string): void;
+    show(x: number, y: number, cell: ICell): void;
     hide(): void;
     init(): IContextMenuClass;
 }
 
 export interface IUtilsClass {
     pxToVw(px: number, base?: number): string;
+    getFormulaCellByPos(pos: string, table: ITableClass): string|undefined;
 }
 
 export interface ICellStyles<T> {

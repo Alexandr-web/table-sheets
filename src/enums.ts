@@ -29,7 +29,14 @@ export enum EnglishAlphabet {
 
 export enum Colors {
     BLACK = "#000",
-    WHITE = "#FFF"
+    WHITE = "#FFF",
+    INDIAN_RED = "#CD5C5C",
+    LIGHT_CORAL = "#F08080",
+    SILVER = "#C0C0C0",
+    GRAY = "#808080",
+    RED = "#FF0000",
+    MAROON = "#800000",
+    YELLOW = "#FFFF00"
 }
 
 export enum CombinationsLetters {

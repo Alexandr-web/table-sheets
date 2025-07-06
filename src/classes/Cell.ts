@@ -72,7 +72,7 @@ export default class Cell implements ICellClass {
 
         if (prevVal !== currentVal) {
             // изменение содержимого ячейки
-            this.table._editCellContent(cell, currentVal, index);
+            this.table.editCellContent(cell, currentVal, index);
 
             if (findCellInFormulas) {
                 this.table.updateFormulaCells(findCellInFormulas, "updating");
@@ -80,10 +80,13 @@ export default class Cell implements ICellClass {
         }
     }
 
-    _setContextMenu(e: MouseEvent): void {
+    _setContextMenu(e: MouseEvent, cell: HTMLLIElement): void {
         e.preventDefault();
 
-        this.contextMenu.show(e.pageX, e.pageY);
+        const index: number = parseInt(cell.dataset.index as string);
+        const activeCell: ICell = this.table.data.cells[index];
+
+        this.contextMenu.show(e.pageX, e.pageY, activeCell);
     }
 
     // инициализация работы ячеек
@@ -91,7 +94,7 @@ export default class Cell implements ICellClass {
         this.elCells.forEach((cell) => {
             cell.addEventListener("focus", this._setActive.bind(this, cell));
             cell.addEventListener("blur", this._setContent.bind(this, cell));
-            cell.addEventListener("contextmenu", this._setContextMenu.bind(this));
+            cell.addEventListener("contextmenu", (e) => this._setContextMenu(e, cell));
             cell.addEventListener("animationend", () => cell.classList.remove(this.updatingClassName));
         });
     }

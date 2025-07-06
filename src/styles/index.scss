@@ -247,6 +247,9 @@
             top: 0;
             transform: translateX(100%);
             display: none;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            max-height: mixins.scale(100);
         }
     }
 

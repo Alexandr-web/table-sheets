@@ -195,7 +195,7 @@ export default class Table implements ITableClass {
 
                 // обновление содержания ячейки, что содержит текущую в своей формуле/функции
                 if (findElCell) {
-                    this._editCellContent(findElCell, newVal, findIdxCell);
+                    this.editCellContent(findElCell, newVal, findIdxCell);
 
                     findElCell.classList.add(updatingClassName);
                 }
@@ -224,6 +224,21 @@ export default class Table implements ITableClass {
         }
     }
 
+    // получение стилей ячейки в формате строки
+    _getCellStyles(cell: ICell): string {
+        const styles: ICellStyles<string> = {
+            color: cell.color,
+            background: cell.background,
+            width: `${utils.pxToVw(cell.width)}vw`,
+            height: `${utils.pxToVw(cell.height)}vw`,
+        };
+        
+        return Object
+            .entries(styles)
+            .map(([prop, val]) => `${prop}: ${val}`)
+            .join(";");
+    }
+
     // добавление ячеек в таблицу
     renderCellsAndLetters(): void {
         const cells: Array<ICell> = this._getCells() as Array<ICell>;
@@ -247,18 +262,9 @@ export default class Table implements ITableClass {
         // функции для получения HTML строк ячейки и буквы
         const cellHTML = (cell: ICell): string => {
             const pos: string = JSON.stringify(cell.position);
-            const styles: ICellStyles<string> = {
-                color: cell.color,
-                background: cell.background,
-                width: `${utils.pxToVw(cell.width)}vw`,
-                height: `${utils.pxToVw(cell.height)}vw`,
-            };
-            const inlineStyles: string = Object
-                .entries(styles)
-                .map(([prop, val]) => `${prop}: ${val}`)
-                .join(";");
+            const styles: string = this._getCellStyles(cell);
 
-            return `<li class="wrapper__cells-list-item" style="${inlineStyles}" data-index="${cell.index}" data-pos='${pos}' data-letter="${cell.position[0]}" data-num="${cell.position[1]}" contenteditable>${cell.content}</li>`;
+            return `<li class="wrapper__cells-list-item" style="${styles}" data-index="${cell.index}" data-pos='${pos}' data-letter="${cell.position[0]}" data-num="${cell.position[1]}" contenteditable>${cell.content}</li>`;
         };
         const cellLetterHTML = (letter: string): string => 
             `<div class="wrapper__cells-letter" data-val="${letter}">
@@ -443,10 +449,19 @@ export default class Table implements ITableClass {
     }
 
     // изменение данных ячейки по ее индексу
-    editCellData(idx: number, key: keyof ICell, value: unknown): void {
+    editCellData(idx: number, key: keyof ICell, value: unknown, updateStyles?: boolean): void {
         const findCell: ICell = this.data.cells[idx];
 
         this.data.cells.splice(idx, 1, { ...findCell, [key]: value, });
+
+        // обновление стилей элемента
+        if (updateStyles) {
+            const updatingCell: ICell = this.data.cells[idx];
+            const el: HTMLLIElement = document.querySelector(`.wrapper__cells-list-item[data-index="${idx}"]`) as HTMLLIElement;
+            const styles: string = this._getCellStyles(updatingCell);
+
+            el.style = styles;
+        }
     }
 
     // сохранение данных таблицы в локальное хранилище
@@ -467,7 +482,7 @@ export default class Table implements ITableClass {
     }
 
     // изменение содержимого ячейки
-    _editCellContent(cell: HTMLLIElement, val: string, index: number): void {
+    editCellContent(cell: HTMLLIElement, val: string, index: number): void {
         this.editCellData(index, "content", val);
         this.saveLocalData();
         this.saveCellsLinkedToFormulas();
