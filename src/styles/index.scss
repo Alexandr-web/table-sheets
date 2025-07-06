@@ -260,16 +260,26 @@
             display: flex;
         }
 
-        span {
+        &-text {
             padding: mixins.scale(5);
-            display: block;
-            color: vars.$dark-gray-2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             font-size: mixins.scale(8);
 
             &:hover {
                 background-color: vars.$light-blue-1;
                 cursor: pointer;
             }
+        }
+
+        &-icon {
+            display: none;
+            max-width: mixins.scale(8);
+        }
+
+        &.checked &-icon {
+            display: block;
         }
     }
 }

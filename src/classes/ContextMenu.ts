@@ -11,6 +11,7 @@ export default class ContextMenu implements IContextMenuClass {
     activeCell: ICell|null;
     copyContent: string|null;
     table: ITableClass;
+    checkedOptionClassName: string;
 
     constructor(data: Array<IContextMenuData>, table: ITableClass) {
         this.elMenu = document.querySelector(".context-menu") as HTMLDivElement;
@@ -18,16 +19,20 @@ export default class ContextMenu implements IContextMenuClass {
         this.activeCell = null;
         this.copyContent = null;
         this.table = table;
+        this.checkedOptionClassName = "checked";
     }
 
+    // создание HTML строки списков из элементов контекстного меню
     _renderItems(list?: Array<IContextMenuData>): string {
         const items: Array<string> = [];
         const data: Array<IContextMenuData> = list ? list : this.data;
 
-        data.forEach(({ text, id, sublist, }) => {
+        data.forEach(({ text, id, sublist, option }) => {
             const sublistStr: string = sublist ? this._renderItems(sublist) : "";
+            const iconCheck: string = `<img class="context-menu__item-icon" src="${require("../assets/icons/check.svg")}" />`;
+            const textEl: string = `<div class="context-menu__item-text">${text}${option ? iconCheck : ""}</div>`
             const item: string = 
-                `<li class="context-menu__item ${sublistStr ? "sublist-parent" : ""}" data-id="${id}"><span>${text}</span>${sublistStr}</li>`;
+                `<li class="context-menu__item ${sublistStr ? "sublist-parent" : ""}" data-id="${id}">${textEl}${sublistStr}</li>`;
 
             items.push(item);
         });
@@ -35,6 +40,7 @@ export default class ContextMenu implements IContextMenuClass {
         return `<ul class="context-menu__list ${list ? "sublist" : ""}">${items.join("\n")}</ul>`;
     }
 
+    // скрытие контекстного меню при клике по экрану
     _hideByScreenClick(e: MouseEvent): void {
         const target: EventTarget|null = e.target;
 
@@ -45,6 +51,7 @@ export default class ContextMenu implements IContextMenuClass {
         this.hide();
     }
 
+    // применение работы элементов контекстного меню
     _clickByItem(e: MouseEvent): void {
         const item: EventTarget|null = e.currentTarget;
 
@@ -56,24 +63,31 @@ export default class ContextMenu implements IContextMenuClass {
         }
 
         const id: string = ((item as HTMLLIElement).dataset.id as string);
+        const idArr: Array<string> = id.split("-");
 
         switch (id) {
             case "copy":
-                return this.copyCellContent();
+                this.copyCellContent();
+                break;
             case "paste":
-                return this.pasteCellContent();
+                this.pasteCellContent();
+                break;
         }
-
-        const idArr: Array<string> = id.split("-");
 
         switch (idArr[0]) {
             case "color":
-                return this.setCellColor(idArr[1]);
+                this.setCellColor(idArr[1]);
+                break;
             case "background":
-                return this.setCellBackground(idArr[1]);
+                this.setCellBackground(idArr[1]);
+                break;
         }
+
+        // устанавливаем на странице активный выбор пользователя
+        this._setCheckedOptions(this.table.data.cells[(this.activeCell as ICell).index]);
     }
 
+    // копирование содержимого/формулы ячейки
     copyCellContent(): void {
         if (!this.activeCell) {
             return;
@@ -87,6 +101,7 @@ export default class ContextMenu implements IContextMenuClass {
         this.hide();
     }
 
+    // вставка скопированного содержимого/формулы
     pasteCellContent(): void {
         if (!this.activeCell || !this.copyContent) {
             return;
@@ -101,6 +116,7 @@ export default class ContextMenu implements IContextMenuClass {
         this.hide();
     }
 
+    // установка цвета текста ячейки
     setCellColor(color: string): void {
         if (!this.activeCell) {
             return;
@@ -109,6 +125,7 @@ export default class ContextMenu implements IContextMenuClass {
         this.table.editCellData(this.activeCell.index, "color", color, true);
     }
 
+    // установка заднего фона ячейки
     setCellBackground(color: string): void {
         if (!this.activeCell) {
             return;
@@ -117,13 +134,42 @@ export default class ContextMenu implements IContextMenuClass {
         this.table.editCellData(this.activeCell.index, "background", color, true);
     }
 
+    // отображение на странице активного выбора пользователя
+    _setCheckedOptions(cell?: ICell): void {
+        const activeCell: ICell = cell ? cell : (this.activeCell as ICell);
+        const colorsCell: NodeListOf<HTMLLIElement> = document.querySelectorAll(".context-menu__item[data-id*=\"color-\"]");
+        const backgroundsCell: NodeListOf<HTMLLIElement> = document.querySelectorAll(".context-menu__item[data-id*=\"background-\"]");
+        const removeCheckedClass = (list: NodeListOf<HTMLLIElement>): void => list.forEach((item) => item.classList.remove(this.checkedOptionClassName));
+        const setCheckedClassToChoosedOption = (list: NodeListOf<HTMLLIElement>, cellOption: keyof ICell): void => {
+            removeCheckedClass(list);
+
+            for (let i = 0; i < list.length; i++) {
+                const el: HTMLLIElement = list[i];
+                const val: string = (el.dataset.id as string).split("-")[1];
+
+                if (val === (activeCell as ICell)[cellOption]) {
+                    el.classList.add(this.checkedOptionClassName);
+
+                    break;
+                }
+            }
+        };
+
+        setCheckedClassToChoosedOption(colorsCell, "color");
+        setCheckedClassToChoosedOption(backgroundsCell, "background");
+    }
+
+    // появление контекстного меню
     show(x: number, y: number, cell: ICell): void {
         this.elMenu.style.display = "block";
         this.elMenu.style.transform = `translate(${utils.pxToVw(x)}vw, ${utils.pxToVw(y)}vw)`;
 
         this.activeCell = cell;
+
+        this._setCheckedOptions();
     }
 
+    // скрытие контекстного меню
     hide(): void {
         this.elMenu.style.display = "none";
     }

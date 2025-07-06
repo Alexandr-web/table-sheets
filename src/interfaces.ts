@@ -108,9 +108,11 @@ export interface IContextMenuClass {
     activeCell: ICell|null;
     copyContent: string|null;
     table: ITableClass;
+    checkedOptionClassName: string;
 
     _renderItems(list?: Array<IContextMenuData>): string;
     _hideByScreenClick(e: MouseEvent): void;
+    _setCheckedOptions(): void;
     copyCellContent(): void;
     pasteCellContent(): void;
     setCellColor(color: string): void;
@@ -135,6 +137,7 @@ export interface ICellStyles<T> {
 export interface IContextMenuData {
     text: string;
     id: string;
+    option?: boolean;
     sublist?: Array<IContextMenuData>;
 }
 

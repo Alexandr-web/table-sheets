@@ -18,7 +18,8 @@ window.addEventListener("DOMContentLoaded", () => {
         .entries(Colors)
         .map(([_, val]) => ({
             text: val,
-            id: `${id}-${val}`
+            id: `${id}-${val}`,
+            option: true
         }));
 
     const contextMenuData: Array<IContextMenuData> = [
