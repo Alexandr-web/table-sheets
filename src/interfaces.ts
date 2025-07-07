@@ -99,7 +99,7 @@ export interface IFormulaClass {
     atanh(args: Array<string|string[]>): string;
     averageVal(args: Array<string|string[]>): string;
     ceiling(args: Array<string|string[]>): string;
-    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string;
+    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell): string;
 }
 
 export interface IContextMenuClass {

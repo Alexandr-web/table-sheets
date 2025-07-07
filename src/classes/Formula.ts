@@ -299,46 +299,51 @@ export default class Formula implements IFormulaClass {
     }
 
     // получение значения всей формулы/функции, применяемой в ячейке
-    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell, currentStr?: string): string {
+    getValueFromFormula(content: string, table: ITableClass, currentCell: ICell): string {
         if (content[0] !== "=") {
             return content;
         }
 
-        const str: string = currentStr || content;
+        const getValue = (currentStr?: string): string => {
+            const str: string = currentStr || content;
 
-        try {
-            // находим самую "нижнюю" (последнюю) функцию
-            const functions: Array<IFunctionName> = this._getFunctionsNames(str);
+            try {
+                // находим самую "нижнюю" (последнюю) функцию
+                const functions: Array<IFunctionName> = this._getFunctionsNames(str);
 
-            if (!functions.length) {
-                throw new Error(LogErrors.NOT_FOUND_FORMULA);
-            }
+                if (!functions.length) {
+                    throw new Error(LogErrors.NOT_FOUND_FORMULA);
+                }
 
-            // определяем ее аргументы
-            const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
-            const findLastFunc: IFunctionName = functions.find(({ idx }) => idx === maxIdx) as IFunctionName;
-            const argsFunc: Array<string|string[]> = this._getFunctionArgs(findLastFunc, table, currentCell, content);
+                // определяем ее аргументы
+                const maxIdx: number = Math.max(...functions.map(({ idx }) => idx));
+                const findLastFuncIdx: number = functions.findIndex(({ idx }) => idx === maxIdx);
+                const findLastFunc: IFunctionName = functions[findLastFuncIdx];
+                const argsFunc: Array<string|string[]> = this._getFunctionArgs(findLastFunc, table, currentCell, content);
 
-            if (argsFunc.length < 2 && !this.formulasWithOneArg.includes(findLastFunc.name)) {
-                throw new Error(LogErrors.NOT_FOUND_FORMULA_ARGUMENTS);
-            }
+                if (argsFunc.length < 2 && !this.formulasWithOneArg.includes(findLastFunc.name)) {
+                    throw new Error(LogErrors.NOT_FOUND_FORMULA_ARGUMENTS);
+                }
 
-            // определяем ее значение
-            const valFunc: string = this._getFunctionVal(findLastFunc.name, argsFunc);
+                // определяем ее значение
+                const valFunc: string = this._getFunctionVal(findLastFunc.name, argsFunc);
 
-            if (functions.length === 1) {
-                return valFunc;
-            }
+                if (functions.length === 1) {
+                    return valFunc;
+                }
 
-            // меняем, если требуется, ее на ее значение в общей строке
-            const newStr: string = str.replace(findLastFunc.fullName, valFunc);
+                // меняем, если требуется, ее на ее значение в общей строке
+                const newStr: string = str.replace(findLastFunc.fullName, valFunc);
 
-            return this.getValueFromFormula(content, table, currentCell, newStr);
-        } catch (err) {
-            console.error(err);
-            console.error(LogErrors.INVALID_FORMULA, content);
+                return getValue(newStr);
+            } catch (err) {
+                console.error(err);
+                console.error(LogErrors.INVALID_FORMULA, content);
 
-            return LogErrors.ERROR_NAME;
-        }
+                return LogErrors.ERROR_NAME;
+            }   
+        };
+
+        return getValue();
     }
 }

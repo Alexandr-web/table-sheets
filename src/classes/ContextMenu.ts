@@ -112,7 +112,13 @@ export default class ContextMenu implements IContextMenuClass {
 
     // вставка скопированного содержимого/формулы
     pasteCellContent(): void {
-        if (!this.activeCell || !this.copyContent) {
+        if (!this.activeCell) {
+            return;
+        }
+
+        if (!this.copyContent) {
+            this.hide();
+
             return;
         }
 
@@ -130,7 +136,7 @@ export default class ContextMenu implements IContextMenuClass {
         if (!this.activeCell) {
             return;
         }
-
+        
         this.table.editCellData(this.activeCell.index, "color", color, true);
     }
 
